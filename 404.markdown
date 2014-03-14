@@ -1,0 +1,8 @@
+---
+title: 404
+layout: page
+---
+
+Nothing found :(
+
+please click [here](/index.html) to enter.

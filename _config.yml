@@ -1,0 +1,19 @@
+markdown: rdiscount
+pygments: true
+permalink: /:year/:month/:day/:title.html
+name: "Biao Wang"
+author: "Biao Wang"
+markdown: rdiscount
+
+atom-baseurl: "#"
+
+navigations:
+  - title: Archive
+    href: /archive.html
+  - title: Tags
+    href: /tags.html
+  - title: About
+    href: /about.html
+  - title: Gallery
+    href: "#"
+
