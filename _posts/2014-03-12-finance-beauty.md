@@ -16,5 +16,5 @@ and I start to appreciating the beauty of finance. Here I have created two proje
 
 Project 1 is just to put aside $1000, naturally it is still $1000 at the end of Year 2; Project 2 represents the scenario where to deposite $1000 in a bank and withdraw in two year with a 5% interest rate. While it is human intuition to be in favor of Project 2, I want to dive deep into the both. Why do we need two projects here, and how to carry out the evaluation?
 
-- __Takeaway#1__: Value (creation) is relative: e.g., use Project "interest rate" __r<sub>1</sub>__=0.00 to evaluate Project 2 and vice versa.  
-- __Takeaway#2__: [Internal rate of return](http://en.wikipedia.org/wiki/Internal_rate_of_return) of a project itself is its interest rate: e.g., the IRR of Project 2 is __r<sub>2</sub>__=0.05.
+__Takeaway#1__: Value (creation) is relative: e.g., use Project "interest rate" __r<sub>1</sub>__=0.00 to evaluate Project 2 and vice versa.  
+__Takeaway#2__: [Internal rate of return](http://en.wikipedia.org/wiki/Internal_rate_of_return) of a project itself is its interest rate: e.g., the IRR of Project 2 is __r<sub>2</sub>__=0.05.
