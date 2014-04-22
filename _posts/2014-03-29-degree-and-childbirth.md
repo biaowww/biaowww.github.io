@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Highest Degree and Choice of Age for the first child
+title: Highest Degree and Choice of Age for the First Child Birth
 tags: 
   - data visualization
   - statistical modeling
