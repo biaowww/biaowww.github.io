@@ -25,4 +25,4 @@ data wrangling, EDA, SQL/NoSQL, advanced machine learning, cloud computing
 -  [GitHub](https://github.com/wvngbvao483): open source code  
 -  [Facebook](https://www.facebook.com/evilbiao): make a contact 
 -  [人人(校内)](http://www.renren.com/229737688): 联系我 
--  [@本杰大叔恨周一](http://weibo.com/234140960): jibber jabber (吐槽)  
+-  [@本杰大叔恨周一(微博)](http://weibo.com/234140960): jibber jabber (吐槽)  
