@@ -7,7 +7,7 @@ My name is Biao Wang. I'm a data scientist living in Beijing, solving real-world
    
 I like technology but I hate it if no business thinking is behind;  
 I like business but I hate it if no data analytics is presented;  
-I like analytics but I hate it if no coding are involved;  
+I like analytics but I hate it if no coding is involved;  
 I like coding but I hate it if that is all of the work.  
 Then, [data science](http://en.wikipedia.org/wiki/Data_science) to the rescue. 
 
