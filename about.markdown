@@ -3,7 +3,7 @@ title:
 layout: page
 ---
 <img src="media/img/gunshooting.jpg" width="205" height="256" align="right">
-My name is Biao Wang. I'm a data scientist living in Beijing, solving real-world problems with a data lens to support company's decision-making everyday.
+My name is Biao Wang. I'm a data scientist living in Hangzhou, solving real-world problems with a data lens to support company's decision-making everyday.
    
 I like technology but I hate it if no business thinking is behind;  
 I like business but I hate it if no data analytics is presented;  
