@@ -15,7 +15,7 @@ My previous work experiences include working with a variety of companies, such a
 [Uber](http://www.uber.com),
 [Merck](http://www.merck.com/mrl/), and
 [Crown Relocations](http://www.crownrelo.com/).
-More information can be found through [Linkedin](www.linkedin.com/in/evilbiao/).
+More information can be found through [Linkedin](https://www.linkedin.com/in/wangbiao).
 
 ### My Arsenal:  
 data wrangling, EDA, SQL/NoSQL, advanced machine learning, cloud computing
