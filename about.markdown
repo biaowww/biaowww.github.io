@@ -14,7 +14,7 @@ Here, I write about technology, big data, and innovation, stay tuned for much mo
 
 ### Find me:
 
--  [GitHub](https://github.com/wvngbvao483)  
--  [Facebook](https://www.facebook.com/evilbiao)
+-  [GitHub](https://github.com/evilbiao)  
+-  [Facebook](https://www.facebook.com/wvngbvao483)
 -  [Linkedin](https://www.linkedin.com/in/wangbiao) 
 -  [Weibo(微博)](http://weibo.com/234140960)
