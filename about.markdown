@@ -2,7 +2,6 @@
 title: 
 layout: page
 ---
-<img src="media/img/me.jpg" width="240" height="320" align="right">
 
 I'm a data scientist working in game industry-100% pure, no free falling. I do many fun data-related stuffs to push boundaries of data technologies, from marketing analytics, social network, recommendation engine, to user growth, etc. Incorporating both data and business thinking, my profession helps to create the very unique me, next generation tech "geek".
 
