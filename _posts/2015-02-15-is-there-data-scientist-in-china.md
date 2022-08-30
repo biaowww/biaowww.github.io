@@ -7,11 +7,16 @@ tags:
 ---
 _disclaimer: The views and opinions expressed in this article are those solely of the author and do not necessarily reflect the condition of any company of any kind._
 
-This whole BIG DATA thing has by all means piqued China's curiosity. Moreover, many companies across industries in China, especially tech companies are taking action to build their data properties and assets, and deploying a data army is one essential part of it. 
+This whole BIG DATA thing has by all means piqued China's curiosity. 
 
-Data scientist is probably one of the most significant data roles in tech companies in Silicon Valley. They lead data project by speaking the language of data, providing top-notch technical expertise, but most importantly they keep data project on track and always align it with company's core business. They are engineers, but more often than not businessmen.
+Moreover, many companies across industries in China, especially tech companies are taking action to build their in-house capability to mine their goldmine, and deploying an army with relevant skills is one essential part of it. 
 
-As needed as it sounds for tech companies in China, Let's see how it pans out.
+Data scientist is probably one of the most significant roles in the this squad. 
+- They provide required not only technical but business expertise  
+- They lead project to drive measureable changes 
+- They speak the new language of data, insinuating a more data-driven culture to be 
+
+**How does data scientist work in China?**
 
 __Data Scientist is Not One Guy.__ The fact that more and more tech companies in China start to value and use data, has indeed changed how they hire data talents. As a matter of fact, current job market is fully filled with all sorts of data-related positions, but sadly enough, no or very few data scientist. 
 
