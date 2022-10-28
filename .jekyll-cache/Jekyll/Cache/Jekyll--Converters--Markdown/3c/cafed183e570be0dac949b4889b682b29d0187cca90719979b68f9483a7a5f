@@ -1,4 +1,4 @@
-I"Ý<div id="tag_cloud">
+I"Y<div id="tag_cloud">
 
 <a href="#finance" title="finance" rel="1">finance</a>
 
@@ -165,6 +165,8 @@
 
 
 </ul>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="/media/js/jquery.tagcloud.js" type="text/javascript" charset="utf-8"></script>
 
