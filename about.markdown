@@ -1,19 +1,26 @@
 ---
-title: 
+title: about
 layout: page
 ---
 
-I'm a data scientist working in game industry-100% pure, no free falling. I do many fun data-related stuffs to push boundaries of data technologies, from marketing analytics, social network, recommendation engine, to user growth, etc. Incorporating both data and business thinking, my profession helps to create the very unique me, next generation tech "geek".
+a
 
-I happened to have worked in several tech multinationals, with each nurturing my career in one way no others can. This also gave me many opportunities to experience different styles of innovation, apply technical mastery across businesses, and think of what tech-really-can do for us, humans.
+> Strategist \| Game Designer \| Researcher \| Engineer
 
-I am just blessed and thankful for this great era, and that we can make the world better with technology. 
+who involved in
 
-Here, I write about technology, big data, and innovation, stay tuned for much more!
+> 第五人格 \| 大话西游
 
-### Find me:
+and host
 
--  [GitHub](https://github.com/biaowww)  
--  [Facebook](https://www.facebook.com/biaowww)
--  [Linkedin](https://www.linkedin.com/in/biaowww) 
--  [Weibo(微博)](http://weibo.com/234140960)
+>《 游戏bb基》
+
+mail
+
+> echo wvngbvao483@gmail.com
+
+or find me
+
+> [linkedin](https://www.linkedin.com/in/biaooow/) \| [知乎](https://zhihu.com/evilviao)
+
+to reach me

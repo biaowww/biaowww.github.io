@@ -5,4 +5,4 @@ layout: page
 
 Nothing found :(
 
-please click [here](/index.html) to enter.
+But you still can have a [look around](/index.html)

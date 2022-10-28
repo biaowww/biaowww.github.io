@@ -1,0 +1,109 @@
+I"�B<p>朴素贝叶斯可以说是机器学习算法里面最简单的一个了。然而简单并不代表它不强大，相反确是在业界最被广泛应用的算法之一，包括Google这样的巨头。朴素贝叶斯所建立的基础是最基本的<a href="http://bit.ly/1LAKbph">贝叶斯定理</a>，通过将复杂的实际场景转变为可计算的算法。</p>
+
+<p>除了表示实现简单，朴素两字包涵了另外一层意思：想法简单，因为算法本身“天真”地假设各个变量间的独立性。如果详细考究算法的明细，理解Bayesian  Networks是必不可少的。接下来对Bayes Networks做下一简单介绍：</p>
+
+<p>贝叶斯网络是对多事件发生条件概率进行建模，又称为Belief Networks。就像人形成对某事的看法是建立在重重假设和条件的基础上，整理事件的概率将其按照<strong><a href="http://en.wikipedia.org/wiki/Conditional_independence">条件独立</a></strong>依赖顺序透过有向网络表达出来。如下图两种情况：左边的事件C条件独立于A、B，而右边的则不是。</p>
+
+<p><img src="/media/img/bn1.png" alt="" /></p>
+
+<p>由事件A、B、C构成的如上贝叶斯网络，三个事件同时发生的概率，分别为：<br />
+左：<strong>P(A,B,C)=P(A)×P(B|A)×P(C|B)</strong><br />
+右：<strong>P(A,B,C)=P(A)×P(B|A)×P(C|A,B)</strong></p>
+
+<p>来个更具体的例子：某公司筹拍<a href="http://movie.douban.com/subject/1889243/">“星际迷航”</a>，在电影公映前对其票房做预测，即<br />
+_结论_事件X：全美票房是否超10亿美金？，其他条件事件分别为：</p>
+
+<p>A：科幻题材影片<br />
+B：电影长度超过两小时<br />
+C：导演:克里斯托弗·诺兰<br />
+D：演员:安妮·海瑟薇 
+…</p>
+
+<p>一般说来结论事件和条件事件（A,B,C..）之间的条件独立关系并不确定，但是在朴素贝叶斯模型中一律假设条件独立性。
+<img src="/media/img/bn2.png" alt="" /></p>
+
+<p>预测票房，需要计算（优化）：<br />
+P(票房|类型:科幻, 长度&gt;2hrs, 导演:诺兰, 演员:海瑟薇,…)</p>
+
+<p>假设将样本数据分为票房（或未）超过十亿美金两类。根据贝叶斯定律，求解：<br />
+P(票房&gt;=十亿, 类型:科幻, 长度&gt;2hrs, 导演:诺兰, 演员:海瑟薇,…)<br />
+p(票房&lt;十亿, 类型:科幻, 长度&gt;2hrs, 导演:诺兰, 演员:海瑟薇,…)</p>
+
+<p>根据朴素贝叶斯假设，以及贝叶斯网络条件独立的性质，可以对分拆求解以上概率，概率高的即为相应类别。以下为使用Python实现的朴素贝叶斯算法，通过用户购买物品预测用户性别。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># encoding: GBK
+</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">nb_model</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">product_name_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span> <span class="c1">#counting data of the form  {'product_name1':[maleCounts,femaleCounts], ...}
+</span>        <span class="c1"># take into account additive smoothing by adding an extra 1
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">product_count</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#contains # of products for male and female
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">train_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">test_data</span> <span class="o">=</span> <span class="p">[]</span>
+     
+    <span class="k">def</span> <span class="nf">splitData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">textFile</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">textFile</span><span class="p">,</span><span class="s">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">split</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">textFile</span><span class="p">,</span><span class="s">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">observation_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">f</span> <span class="p">)</span> <span class="c1">#can't use len(f) as f is an iterator. _ is a special variable name for throwaway variables, see Underscore in Python. can use len(f.readlines()), but need memory for additional list.           
+</span>        <span class="n">random</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">up</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">observation_count</span><span class="o">*</span><span class="p">.</span><span class="mi">6</span><span class="p">)</span> <span class="c1">#60% data as training data
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">train_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">up</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">test_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">up</span><span class="p">]</span> 
+    
+    <span class="k">def</span> <span class="nf">trainNBClassifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">train_data</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">gender</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">product_list</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">split</span><span class="p">(</span><span class="s">','</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">product_list</span><span class="p">:</span> 
+                <span class="bp">self</span><span class="p">.</span><span class="n">product_name_dict</span><span class="p">[</span><span class="n">product</span><span class="p">][</span><span class="n">gender</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="p">.</span><span class="n">product_count</span><span class="p">[</span><span class="n">gender</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span> 
+
+        <span class="k">for</span> <span class="n">product_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">product_name_dict</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">product_name_dict</span><span class="p">[</span><span class="n">product_name</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">.</span><span class="n">product_name_dict</span><span class="p">[</span><span class="n">product_name</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">product_name_dict</span><span class="p">[</span><span class="n">product_name</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">train_data</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="p">.</span><span class="n">product_count</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                    
+    <span class="k">def</span> <span class="nf">Classify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product_vector</span><span class="p">):</span>
+        <span class="n">prob_per_label</span> <span class="o">=</span> <span class="p">{</span><span class="s">'0'</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s">'1'</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span> <span class="c1"># store the final probability for each class
+</span>        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">log_prob</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">product_vector</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">product_name_dict</span><span class="p">:</span>
+                    <span class="n">log_prob</span> <span class="o">+=</span> <span class="bp">self</span><span class="p">.</span><span class="n">product_name_dict</span><span class="p">[</span><span class="n">product</span><span class="p">][</span><span class="n">label</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">log_prob</span> <span class="o">+=</span> <span class="n">math</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">train_data</span><span class="p">)</span><span class="o">+</span> <span class="bp">self</span><span class="p">.</span><span class="n">product_count</span><span class="p">[</span><span class="n">label</span><span class="p">]))</span>
+            <span class="n">prob_per_label</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">)]</span> <span class="o">=</span> <span class="n">log_prob</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">prob_per_label</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">classLabel</span><span class="p">:</span> <span class="n">prob_per_label</span><span class="p">[</span><span class="n">classLabel</span><span class="p">])</span>
+      
+    <span class="k">def</span> <span class="nf">testClassifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">qualified</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">train_data</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">vector</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">split</span><span class="p">(</span><span class="s">','</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span> <span class="c1">#filter data
+</span>                <span class="n">qualified</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1">#print "classifier: " + self.Classify(vector) + " given: " + row[1]
+</span>                <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">Classify</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span> <span class="o">==</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">correct</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">print</span> <span class="s">'out of'</span><span class="p">,</span> <span class="n">qualified</span><span class="p">,</span> <span class="s">'qualified examples'</span><span class="p">,</span> <span class="n">correct</span><span class="p">,</span> <span class="s">'are correctly classified'</span>
+        <span class="k">print</span> <span class="n">correct</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">qualified</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">model</span><span class="o">=</span> <span class="n">nb_model</span><span class="p">()</span>
+    <span class="n">model</span><span class="p">.</span><span class="n">splitData</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">model</span><span class="p">.</span><span class="n">trainNBClassifier</span><span class="p">()</span>
+    <span class="n">model</span><span class="p">.</span><span class="n">testClassifier</span><span class="p">()</span>
+</code></pre></div></div>
+:ET

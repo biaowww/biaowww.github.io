@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="biao" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    
+    <title>Scrapy爬虫心得</title>
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link href="/atom.xml" rel="alternate" title="Biao Wang" type="application/atom+xml" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="/media/css/style.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script type="text/javascript"> hljs.initHighlightingOnLoad(); </script>
+  </head>
+  <body>
+      <div id="main" role="main">
+        <header>
+          <div id="header">
+            <h1><a title="Biao Wang" class="" href="/">Biao Wang</a></h1>
+          </div>
+          <nav>
+            
+            <span><a title="Archive" href="/archive.html"><i class="fas fa-list-ul"></i></a></span>
+            
+            <span><a title="Tags" href="/tags.html"><i class="fas fa-tags"></i></a></span>
+            
+            <span><a title="About" href="/about.html"><i class="fas fa-user"></i></a></span>
+            
+            <span><a title="Subscribe" href="/atom.xml"><i class="fas fa-rss"></i></a></span>
+            
+          </nav>
+        </header>
+        <div id="content">
+        <article>
+  <section class="title">
+    <h2>Scrapy爬虫心得 </h2>
+  </section>
+  <section class="meta">
+  <span class="time">
+    <time datetime="2014-08-28">2014-08-28</time>
+  </span>
+  
+  <span class="tags">
+    
+    <a href="/tags.html#web crawler" title="web crawler">#web crawler</a>
+    
+    <a href="/tags.html#Python" title="Python">#Python</a>
+    
+    <a href="/tags.html#Scrapy" title="Scrapy">#Scrapy</a>
+    
+  </span>
+  <!-- BEGIN this would not work on any other domain -->
+  <span
+    class           = "like-wrapper"
+    like-shortname  = ''
+    like-identifier = ''
+    like-name       = 'Scrapy爬虫心得'
+    like-btn        = '&#xf164;'
+    like-link       = 'http://biaowang.name/2014/08/28/python-scrapy.html'
+    ></span>
+  <script type="text/javascript">
+    var l = document.createElement('script');
+    l.type = 'text/javascript'; l.async = true; l.src = 'https://like.lhzhang.com/javascript/widget.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(l);
+  </script>
+  <!-- END this would not work on any other domain -->
+  
+  </section>
+  <section class="post">
+  <p>这里写一下使用Scrapy在实际应用抓取__中文网页__遇到的问题，主要是针对像我这样第一次使用爬虫framework的菜鸟。</p>
+
+<p>关于Scrapy的发展史和原理，在这里我就不做赘述，官方<a href="http://doc.scrapy.org/">docs</a>以及网上资料已经讲得非常详细了。</p>
+
+<p>首先，在抓取中文网站信息的时候最为棘手的就是<a href="http://stackoverflow.com/questions/643694/utf-8-vs-unicode">码制问题</a>。互联网上公认的地址码制是utf-8，而中文网站上的数据会在Python中以unicode码制被抓取下来。</p>
+
+<p>因此在传递中文参数，导出中文数据时都要十分小心，否则很容易被计算机“误解”。我发现最简单的一个方法就是在爬虫程序加上header，约定python的编码为utf-8。</p>
+
+<h4 id="解析网页-vs-使用rules">解析网页 vs. 使用Rules</h4>
+<p>Scrapy提供了简单易用的方法<a href="http://doc.scrapy.org/en/latest/topics/spiders.html?highlight=rule#scrapy.contrib.spiders.CrawlSpider.rules">Rule</a>。</p>
+
+<p>只需要一行程序，省去了写复杂判断语句去动态解析网页的功夫，提取满足条件的HTML下的链接并跟随，这大大提升了爬虫程序的速度和效率。</p>
+
+<p>例：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rules</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Rule</span><span class="p">(</span><span class="n">LinkExtractor</span><span class="p">(</span><span class="n">restrict_xpaths</span><span class="o">=</span><span class="p">(</span><span class="s">'//div[@class="CoResearcherList"]/p/a'</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span> <span class="n">callback</span><span class="o">=</span><span class="s">"parse_keyword"</span><span class="p">,</span> <span class="n">follow</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+            <span class="n">Rule</span><span class="p">(</span><span class="n">LinkExtractor</span><span class="p">(</span><span class="n">restrict_xpaths</span><span class="o">=</span><span class="p">(</span><span class="s">'//p[@class="pager_space"]'</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span> <span class="n">follow</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>  
+    <span class="p">]</span>
+</code></pre></div></div>
+
+<p>还有需要注意的，在配置爬虫<a href="http://doc.scrapy.org/en/latest/topics/api.html?highlight=setting#module-scrapy.settings">setting</a>文件时需要设置好的两个参数 (以防被当做“机器人”而拦截)：<br />
+一个是抓取速度：DOWNLOAD_DELAY，和抓取随机量：RANDOMIZE_DOWNLOAD_DELAY。</p>
+
+<p>最后留下我在写爬虫时必用到的两个链接：</p>
+
+<ol>
+  <li>测试正则式：<a href="http://regexpal.com/">http://regexpal.com/</a></li>
+  <li>中文-unicode在线转换：<a href="http://javawind.net/tools/native2ascii.jsp?action=transform">http://javawind.net/tools/native2ascii.jsp?action=transform</a></li>
+</ol>
+
+
+  </section>
+  
+</article>
+
+        </div>
+        <footer>
+          <div>
+            
+            &copy; 2014 ~ 2022 biao | powered by jekyll</a>
+          </div>
+        </footer>
+      </div> <!-- main -->
+  </body>
+</html>

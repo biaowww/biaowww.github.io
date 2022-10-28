@@ -1,0 +1,32 @@
+I"<p>这里写一下使用Scrapy在实际应用抓取__中文网页__遇到的问题，主要是针对像我这样第一次使用爬虫framework的菜鸟。</p>
+
+<p>关于Scrapy的发展史和原理，在这里我就不做赘述，官方<a href="http://doc.scrapy.org/">docs</a>以及网上资料已经讲得非常详细了。</p>
+
+<p>首先，在抓取中文网站信息的时候最为棘手的就是<a href="http://stackoverflow.com/questions/643694/utf-8-vs-unicode">码制问题</a>。互联网上公认的地址码制是utf-8，而中文网站上的数据会在Python中以unicode码制被抓取下来。</p>
+
+<p>因此在传递中文参数，导出中文数据时都要十分小心，否则很容易被计算机“误解”。我发现最简单的一个方法就是在爬虫程序加上header，约定python的编码为utf-8。</p>
+
+<h4 id="解析网页-vs-使用rules">解析网页 vs. 使用Rules</h4>
+<p>Scrapy提供了简单易用的方法<a href="http://doc.scrapy.org/en/latest/topics/spiders.html?highlight=rule#scrapy.contrib.spiders.CrawlSpider.rules">Rule</a>。</p>
+
+<p>只需要一行程序，省去了写复杂判断语句去动态解析网页的功夫，提取满足条件的HTML下的链接并跟随，这大大提升了爬虫程序的速度和效率。</p>
+
+<p>例：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rules</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Rule</span><span class="p">(</span><span class="n">LinkExtractor</span><span class="p">(</span><span class="n">restrict_xpaths</span><span class="o">=</span><span class="p">(</span><span class="s">'//div[@class="CoResearcherList"]/p/a'</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span> <span class="n">callback</span><span class="o">=</span><span class="s">"parse_keyword"</span><span class="p">,</span> <span class="n">follow</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+            <span class="n">Rule</span><span class="p">(</span><span class="n">LinkExtractor</span><span class="p">(</span><span class="n">restrict_xpaths</span><span class="o">=</span><span class="p">(</span><span class="s">'//p[@class="pager_space"]'</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span> <span class="n">follow</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>  
+    <span class="p">]</span>
+</code></pre></div></div>
+
+<p>还有需要注意的，在配置爬虫<a href="http://doc.scrapy.org/en/latest/topics/api.html?highlight=setting#module-scrapy.settings">setting</a>文件时需要设置好的两个参数 (以防被当做“机器人”而拦截)：<br />
+一个是抓取速度：DOWNLOAD_DELAY，和抓取随机量：RANDOMIZE_DOWNLOAD_DELAY。</p>
+
+<p>最后留下我在写爬虫时必用到的两个链接：</p>
+
+<ol>
+  <li>测试正则式：<a href="http://regexpal.com/">http://regexpal.com/</a></li>
+  <li>中文-unicode在线转换：<a href="http://javawind.net/tools/native2ascii.jsp?action=transform">http://javawind.net/tools/native2ascii.jsp?action=transform</a></li>
+</ol>
+
+:ET

@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+ <title>Biao Wang</title>
+ <link href="http://biaowang.name/atom.xml" rel="self"/>
+ <link href="http://biaowang.name"/>
+ <updated>2022-10-28T17:06:06+08:00</updated>
+ <id>http://biaowang.name/</id>
+ <author>
+   <name>biao</name>
+ </author>
+
+ 
+ <entry>
+   <title>如何给一个非技术解释大数据架构（Semi-Pitch)</title>
+   <link href="http://biaowang.name/2017/05/15/how-to-build-scalable-datawarehouse-from-0-to-1.html"/>
+   <updated>2017-05-15T00:00:00+08:00</updated>
+   <id>http://biaowang.name/2017/05/15/how-to-build-scalable-datawarehouse-from-0-to-1</id>
+   <content type="html">&lt;p&gt;大数据科技发展至今，技术上不断涌现新的突破，层出不穷的时髦名词闪瞎人眼。几年前大家还把Hadoop挂在嘴边，代表着前沿，代表着逼格，但是现在Hadoop已经成为行业标配，几乎不会再有人用其来炫耀。互联网是孕育大数据，发扬大数据，大数据人才最为集中的行业。那么其他行业呢，所谓的传统行业、政府，民营企业呢？他们憧憬着一切媒体中鼓吹的大数据的好处，近乎着迷地想要获得大数据的魔力，我们如何从技术的角度以最非技术的方式讲述大数据的实践呢？&lt;/p&gt;
+
+&lt;p&gt;对于大多数大数据的未来参与者来说，他们对于其的理解更多停留在统计层面。实际开展行动前，他们渴望更多的是实实在在的干货，一个可以执行的方案。他们看到腾讯在微信上给用户推送广告的“精准”，却不完全理解精准不仅来自计算，更要依赖整个大数据系统在架构和技术上的支持。大多传统行业，例如消费品、制造业，大多生存在供应链这个价值通道上，管理好这条价值链每一环才能最大化公司利益，那么我们就用供应链作比，尝试讲述大数据架构。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/media/img/data_chain.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;一采购数据采集&quot;&gt;一，采购（数据采集）：&lt;/h1&gt;
+&lt;p&gt;首先，如果把数据比作原材料，我们需要从供应商采集这些原材料，公司从供应商那里购买原材料，而数据收集则来自公司实际业务。就像生产要保证原材料的质量，数据自身的准确性也决定了最终数据产品的品质。数据的采集通常需要队列化，并且需要考虑权限和隐私等多方面问题。在这一环节工作的主要是程序员和系统管理员（SA），需要其业务过硬，直接在一线执行和监督数据的采集。&lt;/p&gt;
+
+&lt;h4 id=&quot;数据源&quot;&gt;数据源：&lt;/h4&gt;
+&lt;p&gt;– 传感器&lt;br /&gt;
+– 客户端（例如，每个人的手机）&lt;br /&gt;
+– 人工输入&lt;/p&gt;
+
+&lt;h1 id=&quot;二仓储数据存储&quot;&gt;二，仓储（数据存储）：&lt;/h1&gt;
+&lt;p&gt;有了原材料，我们就需要管理好这些原材料，把数据存在库存中，就像把原材料放在仓库中，这就有了数据库的概念。就像不同类型仓储有着不同的实践和落地方式，我们将一整套工具（包括数据库）和数据存储解决方案抽象成&lt;a href=&quot;http://t.cn/RaWF5Yu&quot;&gt;数据仓库&lt;/a&gt;这个概念，数据使用目的的不同，决定了所需要的相应满足要求的数据仓库。&lt;/p&gt;
+
+&lt;h2 id=&quot;关系型数据库&quot;&gt;关系型数据库&lt;/h2&gt;
+&lt;p&gt;如果我们对数据的响应速度和稳定有较高的要求，例如，用户登录前输入账号密码后需要系统在后端快速查询数据库并作出判断。想象在一个上千甚至上万平方米的仓库快速定位和提取某一件特定货品，需要在设计上做到多么详细的分类，记录，那么一个有着类似高性能的数据仓库也是如此，不同数据之间的关系需要满足并且支持快速的检索。我们称这样的业务场景为OLTP(Online Transaction Processing)，通常以&lt;a href=&quot;http://t.cn/RLZMkRg&quot;&gt;关系型数据库&lt;/a&gt;作为基础进行此场景下的数据仓库开发：在数据库选择上有价格昂贵的企业级数据库Oracle，也有任何一种三方开源数据库解决方案，例如Mysql、Postgres等。&lt;/p&gt;
+
+&lt;h2 id=&quot;非关系型数据库&quot;&gt;非关系型数据库&lt;/h2&gt;
+&lt;p&gt;但是，从另外一个数据使用角度触发，我们更希望通过对数据进行挖掘、分析，发现其中隐藏的信息。这样数据应用称之为OLAP（Online Analytical Processing），在数据量不大，数据类型不多，以及对处理速度要求不高时，相应的产品也可以使用关系型数据库作为开发。随着公司发展总有一天现有的仓库不再能满足生产需求，但是公司的现有库存无法灵活扩展且维护费高，给公司成本产生巨大压力。面临同样压力的互联网企业，催生出了完全不同于关系型数据的一系列数据库解决方案：非关系型数据库（统称NoSQL)。其中最主要的就是参照谷歌Big Table开发的开源大数据框架Hadoop，其主要原理为将数据分布式地存储在成千甚至上万个&lt;strong&gt;便宜且小型&lt;/strong&gt;的计算机（服务器）集群上，需要时利用互联网通信，获取并聚合存储在不同服务器上的数据，并进行分布式计算。这样的存储方式对单个服务器性能的要求低，且有效的降低了成本并提高了系统的可扩展性（如果存储空间不足，只需不断添加服务器）。&lt;/p&gt;
+
+&lt;p&gt;这一步需要技术功底过硬数据工程师，能够根据不同需求，搭建和维护这样的存储平台。&lt;/p&gt;
+
+&lt;h1 id=&quot;三生产数据计算&quot;&gt;三，生产（数据计算）：&lt;/h1&gt;
+&lt;p&gt;有了原材料，并且存储在了仓库中，相当于到了供应链的下游，那么剩下来就是生产了。方式从纯手工生产到自动化生产，不一而足。同样得，使用数据产生结果的方式也是千差万别。俗话说，工欲善其事必先利其器，在不同场景下选择合适的计算方法和框架也至关重要。&lt;/p&gt;
+
+&lt;p&gt;如果我们只是想一次性的计算一个模型，那么可以直接对提取的数据进行计算，不论是用SQL、Python，还是R；
+但是在企业级应用中，由于数据量太大、计算次数频繁、结果实时性要求高，以上的方法已不再适用，需要我们根据需求选择并搭建下列计算框架：&lt;/p&gt;
+
+&lt;h4 id=&quot;常见计算框架&quot;&gt;常见计算框架：&lt;/h4&gt;
+&lt;p&gt;– 分布式计算框架：MapReduce （衍生品，Hive/Mahout）&lt;br /&gt;
+– 实时计算框架：Storm&lt;br /&gt;
+– 平行集群式计算框架：Spark&lt;/p&gt;
+
+&lt;p&gt;最后数据结果产出依靠的人才不仅要有出色的算法能力，还必须会用数据讲故事，能够用数据推动业务。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>囚徒困境之“女人化妆”</title>
+   <link href="http://biaowang.name/2015/06/05/prisoner's-dilemma-women-makeup.html"/>
+   <updated>2015-06-05T00:00:00+08:00</updated>
+   <id>http://biaowang.name/2015/06/05/prisoner's-dilemma-women-makeup</id>
+   <content type="html">&lt;p&gt;今天在Quora看到一个非常有趣的&lt;a href=&quot;http://bit.ly/1RVkeot&quot;&gt;问题&lt;/a&gt;，问囚徒困境在现实生活有什么最典型的例子。其中有一条极其有趣，是：“女人化妆”。花了一些时间来思考，并画下了这个收益矩阵（Payoff），下面给出这个矩阵图并给出我个人的解释。&lt;br /&gt;
+&lt;img src=&quot;/media/img/makeup.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这个问题（收益）每个人都可以有自己的理解，特别是男生和女生的理解又可以有很大的不同。这里说下我的理解，首先有个前提：&lt;strong&gt;化妆是损害皮肤和身体的，仅有的收益是美学上的&lt;/strong&gt;。两个（所有）女人在没有“共谋”的情况下都会选择都化妆，即便她们知道这样是有害健康的，因为化妆是最优策略，也即占优策略(dominant strategy)。&lt;/p&gt;
+
+&lt;p&gt;每一个格子里面的数字为收益（值）。比如在左下角的这个格子：女人A不化妆，女人B化妆。在这样的情况下，因为有了对比，所以女人A相比较起来会变“丑”获得负10收益，而女人B相比较起来会变“漂亮”获得负2.5收益。但收益仍然为负是因为化妆本身依然是有害的，是无法带来正收益的。这里困境在与女人无法选择&lt;strong&gt;全部&lt;/strong&gt;不化妆而使得总收益最高，因为如果任何一方选择化妆均会使另一方收益变为负10。&lt;/p&gt;
+
+&lt;p&gt;学过博弈论的同学很容易可以发现，这里有两个纳什均衡。而如果这个game玩法不一样的话，比如无穷重复（infinite repeated）也将会带来不一样的场景。如果你们感兴趣的话，我们可以私下讨论。不过，想想当时零基础单枪匹马地跑去经济系上他们Ph.D的Game Theory整个学期被虐成渣，真是”不堪回首”却又真正其乐无穷。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Is There Data Scientist in China?</title>
+   <link href="http://biaowang.name/2015/02/15/is-there-data-scientist-in-china.html"/>
+   <updated>2015-02-15T00:00:00+08:00</updated>
+   <id>http://biaowang.name/2015/02/15/is-there-data-scientist-in-china</id>
+   <content type="html">&lt;p&gt;&lt;em&gt;disclaimer: The views and opinions expressed in this article are those solely of the author and do not necessarily reflect the condition of any company of any kind.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;This whole BIG DATA thing has by all means piqued China’s curiosity.&lt;/p&gt;
+
+&lt;p&gt;Moreover, many companies across industries in China, especially tech companies are taking action to build their in-house capability to mine their goldmine, and deploying an army with relevant skills is one essential part of it.&lt;/p&gt;
+
+&lt;p&gt;Data scientist is probably one of the most significant roles in the this squad.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;They provide required not only technical but business expertise&lt;/li&gt;
+  &lt;li&gt;They lead project to drive measureable changes&lt;/li&gt;
+  &lt;li&gt;They speak the new language of data, insinuating a more data-driven culture to be&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;How does data scientist work in China?&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Data Scientist is Not One Guy.&lt;/strong&gt; The fact that more and more tech companies in China start to value and use data, has indeed changed how they hire data talents. As a matter of fact, current job market is fully filled with all sorts of data-related positions, but sadly enough, no or very few data scientist.&lt;/p&gt;
+
+&lt;p&gt;The truth is, tech companies in China normally would just hire different people who specialize on one or two data skills, say ETL, and he/she is then the go-to guy when it comes to that specific data task.&lt;/p&gt;
+
+&lt;p&gt;The occasion where one is able to participate in every step throughout a data project to do whatever have to be done like a data scientist is very rare. In china’s tech companies, &lt;strong&gt;Engineer is engineer, analyst is analyst.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Data Scientist Shouldn’t Be “Dumb”.&lt;/strong&gt; Data scientists are special, to a degree because they have access to all the company’s data, and authority to make decisions or are able to directly influence the decision-maker (like stakeholders). In China, usually the case is that you either do not have access to the data, or it is very difficult or time-consuming to obtain the data; the impact is minimum because you cannot reach out to the executives and will not be heard.&lt;/p&gt;
+
+&lt;p&gt;Disciplines crossing one another really goes a long way towards the development of data science, and I think in order to garner its full benefits, companies have to trust their people and let them grow to become real data scientists.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>朴素贝叶斯的概率理解</title>
+   <link href="http://biaowang.name/2014/12/24/naive-bayes-in-python.html"/>
+   <updated>2014-12-24T00:00:00+08:00</updated>
+   <id>http://biaowang.name/2014/12/24/naive-bayes-in-python</id>
+   <content type="html">&lt;p&gt;朴素贝叶斯可以说是机器学习算法里面最简单的一个了。然而简单并不代表它不强大，相反确是在业界最被广泛应用的算法之一，包括Google这样的巨头。朴素贝叶斯所建立的基础是最基本的&lt;a href=&quot;http://bit.ly/1LAKbph&quot;&gt;贝叶斯定理&lt;/a&gt;，通过将复杂的实际场景转变为可计算的算法。&lt;/p&gt;
+
+&lt;p&gt;除了表示实现简单，朴素两字包涵了另外一层意思：想法简单，因为算法本身“天真”地假设各个变量间的独立性。如果详细考究算法的明细，理解Bayesian  Networks是必不可少的。接下来对Bayes Networks做下一简单介绍：&lt;/p&gt;
+
+&lt;p&gt;贝叶斯网络是对多事件发生条件概率进行建模，又称为Belief Networks。就像人形成对某事的看法是建立在重重假设和条件的基础上，整理事件的概率将其按照&lt;strong&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Conditional_independence&quot;&gt;条件独立&lt;/a&gt;&lt;/strong&gt;依赖顺序透过有向网络表达出来。如下图两种情况：左边的事件C条件独立于A、B，而右边的则不是。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/media/img/bn1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;由事件A、B、C构成的如上贝叶斯网络，三个事件同时发生的概率，分别为：&lt;br /&gt;
+左：&lt;strong&gt;P(A,B,C)=P(A)×P(B|A)×P(C|B)&lt;/strong&gt;&lt;br /&gt;
+右：&lt;strong&gt;P(A,B,C)=P(A)×P(B|A)×P(C|A,B)&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;来个更具体的例子：某公司筹拍&lt;a href=&quot;http://movie.douban.com/subject/1889243/&quot;&gt;“星际迷航”&lt;/a&gt;，在电影公映前对其票房做预测，即&lt;br /&gt;
+_结论_事件X：全美票房是否超10亿美金？，其他条件事件分别为：&lt;/p&gt;
+
+&lt;p&gt;A：科幻题材影片&lt;br /&gt;
+B：电影长度超过两小时&lt;br /&gt;
+C：导演:克里斯托弗·诺兰&lt;br /&gt;
+D：演员:安妮·海瑟薇 
+…&lt;/p&gt;
+
+&lt;p&gt;一般说来结论事件和条件事件（A,B,C..）之间的条件独立关系并不确定，但是在朴素贝叶斯模型中一律假设条件独立性。
+&lt;img src=&quot;/media/img/bn2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;预测票房，需要计算（优化）：&lt;br /&gt;
+P(票房|类型:科幻, 长度&amp;gt;2hrs, 导演:诺兰, 演员:海瑟薇,…)&lt;/p&gt;
+
+&lt;p&gt;假设将样本数据分为票房（或未）超过十亿美金两类。根据贝叶斯定律，求解：&lt;br /&gt;
+P(票房&amp;gt;=十亿, 类型:科幻, 长度&amp;gt;2hrs, 导演:诺兰, 演员:海瑟薇,…)&lt;br /&gt;
+p(票房&amp;lt;十亿, 类型:科幻, 长度&amp;gt;2hrs, 导演:诺兰, 演员:海瑟薇,…)&lt;/p&gt;
+
+&lt;p&gt;根据朴素贝叶斯假设，以及贝叶斯网络条件独立的性质，可以对分拆求解以上概率，概率高的即为相应类别。以下为使用Python实现的朴素贝叶斯算法，通过用户购买物品预测用户性别。&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# encoding: GBK
+&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sys&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;math&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;random&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;collections&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;defaultdict&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12345&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;nb_model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_name_dict&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;defaultdict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;lambda&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#counting data of the form  {&apos;product_name1&apos;:[maleCounts,femaleCounts], ...}
+&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;# take into account additive smoothing by adding an extra 1
+&lt;/span&gt;        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#contains # of products for male and female
+&lt;/span&gt;        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;train_data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;test_data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+     
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;splitData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;textFile&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;textFile&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;r&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;textFile&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;r&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;observation_count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#can&apos;t use len(f) as f is an iterator. _ is a special variable name for throwaway variables, see Underscore in Python. can use len(f.readlines()), but need memory for additional list.           
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shuffle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;up&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;observation_count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#60% data as training data
+&lt;/span&gt;        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;train_data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;up&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:]&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;test_data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;up&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; 
+    
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;trainNBClassifier&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt; 
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;line&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;train_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;gender&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;product_list&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;,&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+            
+            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;product&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;product_list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; 
+                &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_name_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gender&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+                &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gender&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; 
+
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;product_name&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_name_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_name_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                    &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_name_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_name_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;train_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
+                    
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Classify&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;product_vector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;prob_per_label&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;0&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;1&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# store the final probability for each class
+&lt;/span&gt;        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;label&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;log_prob&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;product&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;product_vector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;product&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_name_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;log_prob&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_name_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;label&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;log_prob&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;train_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;product_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;label&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;prob_per_label&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;label&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;log_prob&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;prob_per_label&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;lambda&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;classLabel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;prob_per_label&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;classLabel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+      
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;testClassifier&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;qualified&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;correct&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;line&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;train_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;line&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;,&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#filter data
+&lt;/span&gt;                &lt;span class=&quot;n&quot;&gt;qualified&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+                &lt;span class=&quot;c1&quot;&gt;#print &quot;classifier: &quot; + self.Classify(vector) + &quot; given: &quot; + row[1]
+&lt;/span&gt;                &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Classify&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]:&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;correct&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;out of&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;qualified&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;qualified examples&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;correct&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&apos;are correctly classified&apos;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;correct&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;qualified&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;__main__&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nb_model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;splitData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;trainNBClassifier&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;testClassifier&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Scrapy爬虫心得</title>
+   <link href="http://biaowang.name/2014/08/28/python-scrapy.html"/>
+   <updated>2014-08-28T00:00:00+08:00</updated>
+   <id>http://biaowang.name/2014/08/28/python-scrapy</id>
+   <content type="html">&lt;p&gt;这里写一下使用Scrapy在实际应用抓取__中文网页__遇到的问题，主要是针对像我这样第一次使用爬虫framework的菜鸟。&lt;/p&gt;
+
+&lt;p&gt;关于Scrapy的发展史和原理，在这里我就不做赘述，官方&lt;a href=&quot;http://doc.scrapy.org/&quot;&gt;docs&lt;/a&gt;以及网上资料已经讲得非常详细了。&lt;/p&gt;
+
+&lt;p&gt;首先，在抓取中文网站信息的时候最为棘手的就是&lt;a href=&quot;http://stackoverflow.com/questions/643694/utf-8-vs-unicode&quot;&gt;码制问题&lt;/a&gt;。互联网上公认的地址码制是utf-8，而中文网站上的数据会在Python中以unicode码制被抓取下来。&lt;/p&gt;
+
+&lt;p&gt;因此在传递中文参数，导出中文数据时都要十分小心，否则很容易被计算机“误解”。我发现最简单的一个方法就是在爬虫程序加上header，约定python的编码为utf-8。&lt;/p&gt;
+
+&lt;h4 id=&quot;解析网页-vs-使用rules&quot;&gt;解析网页 vs. 使用Rules&lt;/h4&gt;
+&lt;p&gt;Scrapy提供了简单易用的方法&lt;a href=&quot;http://doc.scrapy.org/en/latest/topics/spiders.html?highlight=rule#scrapy.contrib.spiders.CrawlSpider.rules&quot;&gt;Rule&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;只需要一行程序，省去了写复杂判断语句去动态解析网页的功夫，提取满足条件的HTML下的链接并跟随，这大大提升了爬虫程序的速度和效率。&lt;/p&gt;
+
+&lt;p&gt;例：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;rules&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;Rule&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LinkExtractor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;restrict_xpaths&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;//div[@class=&quot;CoResearcherList&quot;]/p/a&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;unique&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;parse_keyword&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;follow&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;Rule&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LinkExtractor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;restrict_xpaths&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&apos;//p[@class=&quot;pager_space&quot;]&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;unique&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;follow&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;  
+    &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;还有需要注意的，在配置爬虫&lt;a href=&quot;http://doc.scrapy.org/en/latest/topics/api.html?highlight=setting#module-scrapy.settings&quot;&gt;setting&lt;/a&gt;文件时需要设置好的两个参数 (以防被当做“机器人”而拦截)：&lt;br /&gt;
+一个是抓取速度：DOWNLOAD_DELAY，和抓取随机量：RANDOMIZE_DOWNLOAD_DELAY。&lt;/p&gt;
+
+&lt;p&gt;最后留下我在写爬虫时必用到的两个链接：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;测试正则式：&lt;a href=&quot;http://regexpal.com/&quot;&gt;http://regexpal.com/&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;中文-unicode在线转换：&lt;a href=&quot;http://javawind.net/tools/native2ascii.jsp?action=transform&quot;&gt;http://javawind.net/tools/native2ascii.jsp?action=transform&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Hadoop on Mac OS X (&lt;strike&gt;pre-installed&lt;/strike&gt;)</title>
+   <link href="http://biaowang.name/2014/03/31/Set-up-Hadoop-on-Mac.html"/>
+   <updated>2014-03-31T00:00:00+08:00</updated>
+   <id>http://biaowang.name/2014/03/31/Set-up-Hadoop-on-Mac</id>
+   <content type="html">&lt;p&gt;Still not a big fan of Virtual Machine (VM), I was trying to set up Hadoop framework on my Mac OS X Mavericks, so the cluster will be pseudo-distributed, single-node. I chose not to touch &lt;a href=&quot;http://bit.ly/1erBmDT&quot;&gt;Hadoop distributions&lt;/a&gt; to have some fun with installation in console. Instead of “playing hardcore”, using package manager like &lt;a href=&quot;http://bit.ly/1EuteHH&quot;&gt;this&lt;/a&gt; with homebrew is very much recommended.&lt;/p&gt;
+
+&lt;p&gt;1 . Add a new user account (for security reason) and enable remote login access for it, both can be done in System Preferences, and make sure you have the latest java version.&lt;br /&gt;
+2 . Switch to the new user, generate a key and pass it to authorized_keys. This step sets up networking that enables SSH to localhost, and you can verify by typing &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ssh localhost&lt;/code&gt; in the terminal, which should return success.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;su - hadoop
+ssh-keygen &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; rsa &lt;span class=&quot;nt&quot;&gt;-P&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; .ssh
+&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$HOME&lt;/span&gt;/.ssh/id_rsa.pub &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$HOME&lt;/span&gt;/.ssh/authorized_keys
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;3 . &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;curl -o&lt;/code&gt; to get the latest Hadoop .tar file from &lt;a href=&quot;http://hadoop.apache.org/&quot;&gt;Hadoop.apache.org&lt;/a&gt;&lt;br /&gt;
+4 . Untar the file and change the ownership if necessary
+5 . Edit hadoop configuration files (under etc/hadoop/): hadoop-env.sh, core-site.xml, hdfs-site.xml, mapred-site.xml, yarn-site.xml. Make what changes could be somewhat very tricky, and there are a hundred dozens of examples you can find online. If you happend to run into any trouble (like I did), please don’t hesitate to reach out and I am willing to help.&lt;br /&gt;
+6 . &lt;strike&gt;Change hosts&lt;/strike&gt; not necessary under this circumstance.&lt;/p&gt;
+
+&lt;p&gt;Once these steps have been done, you can &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cd&lt;/code&gt; into the hadoop directory, and you will find the bin/ directory and all the executables inside it. Start your cluster, and have fun.&lt;/p&gt;
+
+&lt;p&gt;This is a complete Hadoop cluster running on a single machine.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>the Beauty of Finance</title>
+   <link href="http://biaowang.name/2014/03/12/finance-beauty.html"/>
+   <updated>2014-03-12T00:00:00+08:00</updated>
+   <id>http://biaowang.name/2014/03/12/finance-beauty</id>
+   <content type="html">&lt;p&gt;In the world of finance, profound math is probably of the least concern. Unless impossible, people care to approach  problems in simple ways with a &lt;em&gt;sound logic&lt;/em&gt;. Though, finance deals with numbers, we don’t see lines of mathematic equations, or as sophisticated methodology as physics in finance. See &lt;a href=&quot;http://www.wallstreetoasis.com/blog/do-i-need-math-for-finance&quot;&gt;here&lt;/a&gt; how differennt math works out in finance.&lt;/p&gt;
+
+&lt;p&gt;The very first time I was exposed to finance, I thought I had no difficulty in &lt;a href=&quot;http://www.algebra.com/algebra/homework/Finance/FINANCIAL-FORMULAS-101.lesson&quot;&gt;financial equations&lt;/a&gt;. The hard part, however, is understanding the essences and making sense of them. Before uncertainty, really is where financial thinking comes to play.
+and I start to appreciating the beauty of finance. Here I have created two projects.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/media/img/finance_beauty.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Project 1 is to put aside $1000, naturally it is still $1000 at the end of Year 2; Project 2 represents the scenario where to deposite $1000 in a bank and withdraw in two year with a 5% interest rate. While it is human intuition to be in favor of Project 2, I want to take a deep dive into the decision-making, not just by showing the &lt;a href=&quot;http://www.investopedia.com/terms/n/npv.asp&quot;&gt;NPVs&lt;/a&gt; for both projects.&lt;/p&gt;
+
+&lt;p&gt;We value the two projects using NPV, however it would be useless (or even impossible to calculate) if we can only take Project 1.&lt;br /&gt;
+&lt;strong&gt;Takeaway#1&lt;/strong&gt;: Value (creation) is relative: e.g., use Project 2 interest &lt;strong&gt;r&lt;sub&gt;2&lt;/sub&gt;&lt;/strong&gt;=0.00 to evaluate Project 1 and vice versa.&lt;/p&gt;
+
+&lt;p&gt;People use IRR, cost of capital and interest rate in different financial settings, but they are essentially the same.&lt;br /&gt;
+&lt;strong&gt;Takeaway#2&lt;/strong&gt;: &lt;a href=&quot;http://en.wikipedia.org/wiki/Internal_rate_of_return&quot;&gt;Internal rate of return&lt;/a&gt; of a Project 2 is its interest rate: i.e., the IRR of Project 2 is &lt;strong&gt;r&lt;sub&gt;2&lt;/sub&gt;&lt;/strong&gt;=0.05, and we plug it into the formula to get the NPV of Project 1.&lt;/p&gt;
+
+&lt;p&gt;In finance, it is not shockingly counter intuitive. We spend a lot time and effort to boil down a lot of thinking and working to simple outcomes. It is simplicity that is the beauty of finance.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ 
+</feed>
