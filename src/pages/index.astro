@@ -7,15 +7,15 @@ import links from '../data/links.json';
 
 const { acts, chapters } = journeyData;
 const chapterIcons: Record<string, string> = {
-  chengdu: '🏔', wuhan: '🌲', arizona: '🌵', photographer: '📷',
+  chengdu: '🏔', wuhan: '🌲', arizona: '🌵', uber: '🚗', photographer: '📷',
   netease: '📊', quantic: '🤖', insead: '🌍', accenture: '🗡',
   metaarteek: '🕹', offcircle: '🚀', insurance: '🛡',
 };
 // 开屏标签 → 对应章节锚点（前后呼应）
 const heroTags = [
+  { label: '#运营专员', anchor: 'ch-uber' },
   { label: '#摄影师', anchor: 'ch-photographer' },
   { label: '#数据工程师', anchor: 'ch-netease' },
-  { label: '#运营专员', anchor: 'ch-netease' },
   { label: '#管理咨询顾问', anchor: 'ch-accenture' },
   { label: '#游戏开发者', anchor: 'ch-metaarteek' },
   { label: '#创业者', anchor: 'ch-offcircle' },
@@ -23,7 +23,7 @@ const heroTags = [
 ];
 // 剧情曲线节点：x 均分，y 手工定（低 = 高光时刻）
 const curvePoints: Array<[string, number]> = [
-  ['chengdu', 16], ['wuhan', 46], ['arizona', 66], ['photographer', 58],
+  ['chengdu', 16], ['wuhan', 46], ['arizona', 66], ['uber', 50], ['photographer', 56],
   ['netease', 44], ['quantic', 36], ['insead', 60], ['accenture', 40],
   ['metaarteek', 78], ['offcircle', 28], ['insurance', 38],
 ];
@@ -78,7 +78,7 @@ const swVar: Record<string, string> = { R: '--green', E: '--blue', N: '--orange'
         <span class="draft-chip">文案草稿 · 待定稿</span>
         <p>我叫<span class="kw">王彪</span>，一个白手起家、经历超杂的游戏农民工。</p>
         <p>两条线贯穿我的履历：作为<span class="kw">第一代数据人</span>，我从给别人提建议的分析师，做成亲手写产品的开发者，如今正把下一步押在一家 <span class="kw">AI-native 游戏公司</span>上；作为游戏人，我的职业生涯几乎与<span class="kw">中国移动游戏的腾飞</span>同频——从流量为王，到《黑神话》式的品质时代，我都在场。</p>
-        <p>中间绕过不少路：赴美直博、职业摄影师、巴黎 Quantic Dream 顾问、INSEAD、埃森哲军师，2026 年还开了保险经纪这条新支线。绕路让我确认了一件事：<span class="kw">「玩」是人的天性</span>——做出配得上这份天性的游戏，值得当成一生的主线任务。</p>
+        <p>中间绕过不少路：赴美直博又退学、加州 Uber 做增长、兼职职业摄影师、巴黎 Quantic Dream 顾问、INSEAD、埃森哲军师，2026 年还开了保险经纪这条新支线。绕路让我确认了一件事：<span class="kw">「玩」是人的天性</span>——做出配得上这份天性的游戏，值得当成一生的主线任务。</p>
       </div>
     </section>
 
@@ -101,8 +101,8 @@ const swVar: Record<string, string> = { R: '--green', E: '--blue', N: '--orange'
             </a>
           ))}
           <text x={pts[0].x - 12} y={pts[0].y - 14} font-size="12" fill="var(--ink-dim)">巅峰</text>
-          <text x={pts[8].x - 24} y={pts[8].y + 22} font-size="12" fill="var(--ink-dim)">至暗时刻?</text>
-          <text x={pts[9].x - 12} y={pts[9].y - 14} font-size="12" fill="var(--ink-dim)">NOW↗</text>
+          <text x={pts[9].x - 24} y={pts[9].y + 22} font-size="12" fill="var(--ink-dim)">至暗时刻?</text>
+          <text x={pts[10].x - 12} y={pts[10].y - 14} font-size="12" fill="var(--ink-dim)">NOW↗</text>
         </svg>
         <p class="curve-note">* 剧情曲线：巅峰出现在开场第 5 分钟，编剧胆子很大。节点可点击跳转。</p>
       </div>
