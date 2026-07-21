@@ -1,0 +1,58 @@
+[
+  {
+    "icon": "🎙",
+    "name": "游戏哔哔基",
+    "kind": "播客",
+    "desc": "自制游戏行业播客，2020—2023，正片 15 期 + 番外 4 期 + 机油连线 3 期。聊游戏、聊行业、聊做游戏的人。",
+    "link": "",
+    "linkLabel": "收听（链接待补）"
+  },
+  {
+    "icon": "✍️",
+    "name": "我想做一个游戏",
+    "kind": "公众号合集",
+    "desc": "什么是游戏、游戏规则、角色与故事——一个制作人的游戏设计科普连载。",
+    "link": "",
+    "linkLabel": "阅读（链接待补）"
+  },
+  {
+    "icon": "🏛",
+    "name": "Renaissance Gamers",
+    "kind": "公众号合集",
+    "desc": "元宇宙三问、哲学入门、孙子兵法——游戏玩家的文艺复兴式思辨。",
+    "link": "",
+    "linkLabel": "阅读（链接待补）"
+  },
+  {
+    "icon": "⚙️",
+    "name": "me: become human",
+    "kind": "公众号合集",
+    "desc": "生产力游戏、冥想、知识与专家——把自己当成一个可升级的角色来运营。",
+    "link": "",
+    "linkLabel": "阅读（链接待补）"
+  },
+  {
+    "icon": "🎮",
+    "name": "空裂 · Project Breach",
+    "kind": "游戏 · 开发中",
+    "desc": "OFF-CIRCLE 旗舰项目：英雄策略战棋。网页版与 3D 版双引擎并进。",
+    "link": "https://offcircle-studios.com",
+    "linkLabel": "工作室官网"
+  },
+  {
+    "icon": "🎵",
+    "name": "音乐习作",
+    "kind": "编曲 / 翻唱",
+    "desc": "《爱很简单》《残酷月光》《左边》《Do You Remember》——Logic 工程从 raw 到 mastered 的完整修行。",
+    "link": "",
+    "linkLabel": "试听（链接待补）"
+  },
+  {
+    "icon": "🎨",
+    "name": "绘画习作",
+    "kind": "数字绘画",
+    "desc": "Krita 数字绘画 + 学院派素描基本功。跟着 Bob Ross 画完了 s01e01。",
+    "link": "",
+    "linkLabel": "画廊（待建）"
+  }
+]

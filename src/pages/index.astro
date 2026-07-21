@@ -1,0 +1,196 @@
+---
+import '../styles/global.css';
+import journey from '../data/journey.json';
+import footprint from '../data/footprint.json';
+import works from '../data/works.json';
+import links from '../data/links.json';
+
+const chapterIcons: Record<string, string> = {
+  chengdu: '🏔', wuhan: '🌲', arizona: '🌵', netease: '📊',
+  quantic: '🤖', insead: '🌍', accenture: '🗡', offcircle: '🕹',
+};
+const mapRows = footprint.pixelMap;
+const mapCols = Math.max(...mapRows.map((r) => r.length));
+const continentByKey = Object.fromEntries(footprint.continents.map((c) => [c.key, c]));
+const visitedCount = footprint.continents.filter((c) => c.visited).length;
+const explorePct = Math.round((visitedCount / 7) * 100);
+const chinaPct = Math.round((footprint.china.visited / footprint.china.total) * 100);
+---
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BIAO WANG · 一个把「玩」当主线任务的人</title>
+    <meta name="description" content="王彪的个人网站：游戏制作人的英雄旅程、世界探索度与创作物品栏。" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/fusion-pixel-12px-proportional-zh_hans@2025.5.14/font.min.css"
+    />
+    <style>
+      body { font-family: 'fusion-pixel-12px-proportional-zh_hans', ui-monospace, 'Microsoft YaHei', monospace; }
+    </style>
+  </head>
+  <body>
+    <!-- 0 · 标题画面 -->
+    <section id="title-screen">
+      <h1>BIAO WANG</h1>
+      <p class="tagline">游戏制作人 / 前数据法师 / Renaissance Gamer</p>
+      <p class="tagline">一个把「玩」当主线任务的人</p>
+      <button class="press-start" onclick="document.getElementById('intro').scrollIntoView()">
+        ▶ PRESS START
+      </button>
+      <p class="hint">按下开始，读取存档</p>
+    </section>
+
+    <!-- intro -->
+    <section id="intro">
+      <h2 class="sec-title">READ ME</h2>
+      <p class="sec-sub">// 开场白，60 秒读完</p>
+      <div class="panel">
+        <p>你好，我是<span class="kw">王彪</span>。现在的身份是游戏工作室 <span class="kw">OFF-CIRCLE 超元</span> 的创始人，正在做一款叫《<span class="kw">空裂</span>》的策略战棋。</p>
+        <p>在这之前，我在网易用数据研究「人为什么玩游戏」，在巴黎 Quantic Dream 当过顾问，读了个 INSEAD MBA，又在埃森哲给大厂当军师——绕了一大圈，最后决定亲手做游戏。</p>
+        <p>业余时间录播客、写字、画画、编曲。我相信「玩」是人的天性，也是我唯一认真对待的事。</p>
+      </div>
+    </section>
+
+    <!-- 1 · 英雄旅程 -->
+    <section id="journey">
+      <h2 class="sec-title">英雄旅程</h2>
+      <p class="sec-sub">// 主线剧情回顾 · 向下滚动点亮章节</p>
+      <div class="xp-wrap">
+        <div class="xp-label"><span>LIFE XP</span><span id="xp-num">0%</span></div>
+        <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
+      </div>
+      {journey.map((ch) => (
+        <div class="chapter" data-chapter>
+          <div>
+            <div class="node">{chapterIcons[ch.id] ?? '▪'}</div>
+            <div class="rail"></div>
+          </div>
+          <div>
+            <div class="chapter-head">
+              <span class={`tag ${ch.chapter.includes('支线') ? 'side' : ''}`}>{ch.chapter}</span>
+              <h3>{ch.title}</h3>
+              <div class="meta">{ch.loc} · {ch.years}</div>
+            </div>
+            {ch.lines.map((l, i) => (
+              <p class={ch.id === 'chengdu' && i === 0 ? 'peak' : ''}>{l}</p>
+            ))}
+          </div>
+        </div>
+      ))}
+    </section>
+
+    <!-- 2 · 世界地图 -->
+    <section id="map">
+      <h2 class="sec-title">世界地图</h2>
+      <p class="sec-sub">// WORLD EXPLORED · 悬停查看大洲战报</p>
+      <p class="map-stats">探索度 <b>{explorePct}%</b>（{visitedCount} / 7 大洲）</p>
+      <div class="map-grid" style={`grid-template-columns: repeat(${mapCols}, 16px);`}>
+        {mapRows.flatMap((row) =>
+          Array.from({ length: mapCols }, (_, x) => {
+            const chLetter = row[x] ?? '.';
+            if (chLetter === '.') return <div class="cell"></div>;
+            const cont = continentByKey[chLetter];
+            const cls = cont?.visited ? `cell land lit-${chLetter}` : 'cell land';
+            return <div class={cls} data-cont={chLetter}></div>;
+          })
+        )}
+      </div>
+      <div id="map-tip">—</div>
+      <div class="legend">
+        {footprint.continents.map((c) => (
+          <span class={`item ${c.visited ? 'v' : ''}`} data-cont={c.key}>
+            <span class="sw" style={c.visited ? `background: var(${{R:'--green',E:'--blue',N:'--amber',A:'--pink',O:'--teal'}[c.key] ?? '--green'})` : ''}></span>
+            {c.name}{c.visited ? '' : ` · ${c.note}`}
+          </span>
+        ))}
+      </div>
+      <div class="china-bar panel">
+        <div class="row"><span>中国 · 省级行政区点亮进度</span><b>{footprint.china.visited} / {footprint.china.total}（{chinaPct}%）</b></div>
+        <div class="china-track"><div class="china-fill" style={`width:${chinaPct}%`}></div></div>
+        <p class="china-note">待解锁关卡：<span class="lock">{footprint.china.remaining.join(' · ')}</span></p>
+      </div>
+    </section>
+
+    <!-- 3 · 创作物品栏 -->
+    <section id="inventory">
+      <h2 class="sec-title">创作物品栏</h2>
+      <p class="sec-sub">// INVENTORY · 不罗列过往，只陈列主题</p>
+      <div class="grid">
+        {works.map((w) => (
+          <div class="slot">
+            <span class="icon">{w.icon}</span>
+            <div class="kind">{w.kind}</div>
+            <h3>{w.name}</h3>
+            <p>{w.desc}</p>
+            {w.link
+              ? <a href={w.link} target="_blank" rel="noopener">{w.linkLabel} →</a>
+              : <span class="todo">{w.linkLabel}</span>}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- 4 · 好友列表 -->
+    <section id="links">
+      <h2 class="sec-title">好友列表</h2>
+      <p class="sec-sub">// 在别的服务器找到我</p>
+      <ul>
+        {links.map((l) => (
+          <li>
+            <span class={`dot ${l.url ? '' : 'off'}`}></span>
+            {l.url ? <a href={l.url} target="_blank" rel="noopener">{l.name}</a> : <span>{l.name}</span>}
+            <span class="tag">{l.tag}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <footer>
+      <p>© 2026 BIAO WANG · 本站由像素与执念构成</p>
+      <p><span class="c">CONTINUE?</span> — 是的，主线仍在更新。</p>
+    </footer>
+
+    <script>
+      // 章节点亮 + XP 进度条（滚动计算，点亮后不熄灭）
+      const chapters = [...document.querySelectorAll('[data-chapter]')];
+      const xpFill = document.getElementById('xp-fill');
+      const xpNum = document.getElementById('xp-num');
+      const lit = new Set();
+      function checkChapters() {
+        const vh = window.innerHeight;
+        for (const c of chapters) {
+          if (lit.has(c)) continue;
+          const r = c.getBoundingClientRect();
+          if (r.top < vh * 0.72) {
+            c.classList.add('lit');
+            lit.add(c);
+          }
+        }
+        const pct = Math.round((lit.size / chapters.length) * 100);
+        xpFill.style.width = pct + '%';
+        xpNum.textContent = pct + '%';
+      }
+      addEventListener('scroll', checkChapters, { passive: true });
+      addEventListener('resize', checkChapters);
+      checkChapters();
+
+      // 地图悬停战报
+      const tip = document.getElementById('map-tip');
+      const CONT = JSON.parse(document.getElementById('cont-data').textContent);
+      document.querySelectorAll('[data-cont]').forEach((el) => {
+        el.addEventListener('mouseenter', () => {
+          const c = CONT[el.dataset.cont];
+          if (!c) return;
+          tip.textContent = c.visited
+            ? `${c.name} ✅ ${c.places.join(' / ')}`
+            : `${c.name} 🔒 ${c.note}`;
+        });
+      });
+    </script>
+    <script type="application/json" id="cont-data" set:html={JSON.stringify(continentByKey)}></script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "china": {
+    "total": 34,
+    "visited": 30,
+    "remaining": ["山西", "内蒙古", "辽宁", "黑龙江"]
+  },
+  "continents": [
+    { "key": "R", "name": "亚洲", "visited": true, "places": ["中国", "日本", "韩国", "新加坡", "泰国", "印度尼西亚", "印度", "孟加拉", "尼泊尔"] },
+    { "key": "E", "name": "欧洲", "visited": true, "places": ["法国", "德国", "匈牙利", "奥地利"] },
+    { "key": "N", "name": "北美洲", "visited": true, "places": ["美国", "墨西哥"] },
+    { "key": "A", "name": "非洲", "visited": true, "places": ["肯尼亚", "摩洛哥", "坦桑尼亚（桑给巴尔）"] },
+    { "key": "O", "name": "大洋洲", "visited": true, "places": ["澳大利亚"] },
+    { "key": "S", "name": "南美洲", "visited": false, "places": [], "note": "未解锁地图" },
+    { "key": "T", "name": "南极洲", "visited": false, "places": [], "note": "最终 BOSS，未解锁" }
+  ],
+  "pixelMap": [
+    "....NNNN..........EE.RRRRRRRRRR....",
+    "..NNNNNNNN......EEEE.RRRRRRRRRRRR..",
+    "..NNNNNNNN.....EEEEE.RRRRRRRRRRR...",
+    "...NNNNNN.......EEE..RRRRRRRRRR....",
+    "....NNNN.........AA..RRRRRRRR......",
+    ".....NN.N.......AAAA..RRRR.RR......",
+    "......SSS.......AAAAA...RR..R......",
+    ".....SSSSS......AAAA........O......",
+    ".....SSSS........AAA.......OOOO....",
+    "......SS..........A........OOO.....",
+    ".......S...........................",
+    "...TTTTTTTTTTTTTTTTTTTTTTTTTTTT..."
+  ]
+}
