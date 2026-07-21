@@ -1,7 +1,7 @@
 [
   { "name": "GitHub", "url": "https://github.com/biaowww", "tag": "代码" },
   { "name": "OFF-CIRCLE 超元", "url": "https://offcircle-studios.com", "tag": "工作室" },
-  { "name": "微信公众号", "url": "", "tag": "文字 · 名称待补" },
-  { "name": "播客平台", "url": "", "tag": "声音 · 链接待补" },
-  { "name": "LinkedIn", "url": "", "tag": "职业 · 链接待补" }
+  { "name": "公众号 · 超元offcircle", "url": "", "tag": "文字 · 微信内搜索" },
+  { "name": "游戏哔哔基", "url": "https://podcasts.apple.com/cn/podcast/%E6%B8%B8%E6%88%8F%E5%93%94%E5%93%94%E5%9F%BA/id1547167853", "tag": "播客 · 已完结" },
+  { "name": "LinkedIn", "url": "https://www.linkedin.com/in/biaowww/", "tag": "职业" }
 ]
