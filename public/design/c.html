@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案 C · 角色选择大厅 — 王彪</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fusion-pixel-12px-proportional-zh_hans@2025.5.14/font.min.css">
+<style>
+:root{
+  --bg:#f7f1e5; --bg-panel:#fffaf0; --ink:#46403a; --ink-dim:#a2937f;
+  --line:#e4d7c0; --line-dark:#d3c3a6;
+  --orange:#e0913e; --green:#7fa470; --blue:#7d9cc0; --red:#c9705f;
+  --pink:#d494a8; --teal:#6fae9c;
+  --lilac:#a98fbb;            /* 唯一新增：第 7 个身份需要一个色位，取同调低饱和紫 */
+  --c:var(--orange);          /* 当前职业主色，由 JS 改写 */
+  --pix:'fusion-pixel-12px-proportional-zh_hans','Zpix',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--pix);
+  font-size:13px; line-height:1.7;
+  -webkit-font-smoothing:none;
+  overflow-x:hidden;
+}
+img{image-rendering:pixelated; -ms-interpolation-mode:nearest-neighbor; max-width:100%; display:block}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{max-width:1120px;margin:0 auto;padding:0 18px}
+
+/* ── 顶部提示条 ───────────────────────────── */
+.topbar{
+  background:var(--ink); color:var(--bg);
+  border-bottom:3px solid var(--line-dark);
+}
+.topbar .wrap{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;padding-top:9px;padding-bottom:9px}
+.topbar b{font-weight:400;color:var(--orange);letter-spacing:.04em}
+.topbar span{color:#d8ccb8;font-size:12px}
+
+/* ── HERO ─────────────────────────────────── */
+.hero{padding:22px 0 8px}
+.panel{
+  background:var(--bg-panel);
+  border:3px solid var(--line-dark);
+  box-shadow:5px 5px 0 var(--line);
+}
+.charbox{display:grid;grid-template-columns:262px 1fr;gap:0}
+
+/* 立绘 */
+.portrait{
+  position:relative;padding:16px;
+  border-right:3px solid var(--line-dark);
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb,var(--c) 26%,transparent) 0%, transparent 62%),
+    repeating-linear-gradient(0deg,transparent 0 5px,rgba(0,0,0,.018) 5px 6px);
+  transition:background .45s ease;
+  display:flex;flex-direction:column;gap:10px;
+}
+.portrait .frame{
+  position:relative;border:2px solid var(--c);
+  background:#f8ecc9;transition:border-color .35s ease,box-shadow .35s ease;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 22%,transparent), inset 0 0 24px color-mix(in srgb,var(--c) 20%,transparent);
+}
+.portrait .frame img{width:100%;transition:filter .45s ease}
+.portrait .frame::after{ /* 角标 */
+  content:'';position:absolute;inset:-2px;pointer-events:none;
+  background:
+    linear-gradient(var(--c),var(--c)) 0 0/9px 3px no-repeat,
+    linear-gradient(var(--c),var(--c)) 0 0/3px 9px no-repeat,
+    linear-gradient(var(--c),var(--c)) 100% 100%/9px 3px no-repeat,
+    linear-gradient(var(--c),var(--c)) 100% 100%/3px 9px no-repeat;
+}
+.plate{
+  text-align:center;font-size:11px;color:var(--ink-dim);
+  border:2px dashed var(--line-dark);padding:5px 6px;
+}
+.plate b{color:var(--c);font-weight:400;transition:color .3s}
+
+/* 角色卡 */
+.card{padding:18px 20px 16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.who{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.who h1{font-size:30px;margin:0;letter-spacing:.06em;line-height:1.2}
+.who .en{font-size:11px;color:var(--ink-dim);letter-spacing:.16em;padding-bottom:5px}
+.title-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.badge{
+  display:inline-block;padding:3px 10px;font-size:12px;
+  background:var(--c);color:#fffaf0;
+  box-shadow:2px 2px 0 color-mix(in srgb,var(--c) 45%,var(--ink));
+  transition:background .3s,box-shadow .3s;
+}
+.era{font-size:11px;color:var(--ink-dim)}
+.line{font-size:12.5px;color:var(--ink);min-height:2.6em;
+  border-left:3px solid var(--c);padding-left:10px;transition:border-color .3s}
+.line em{font-style:normal;color:var(--ink-dim)}
+
+/* 属性条 */
+.stats{display:flex;flex-direction:column;gap:7px;margin-top:2px}
+.stat{display:grid;grid-template-columns:44px 1fr 34px;align-items:center;gap:9px}
+.stat .lb{font-size:11px;color:var(--ink-dim)}
+.stat .bar{
+  height:14px;background:#efe4cd;border:2px solid var(--line-dark);
+  padding:1px;position:relative;overflow:hidden;
+}
+.stat .bar i{
+  display:block;height:100%;width:0;
+  background:repeating-linear-gradient(90deg,var(--sc) 0 6px,color-mix(in srgb,var(--sc) 72%,#fff) 6px 8px);
+  transition:width .6s cubic-bezier(.3,1,.4,1);
+}
+.stat .val{font-size:12px;text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+.meta{font-size:11px;color:var(--ink-dim);border-top:2px dotted var(--line-dark);padding-top:9px;margin-top:auto}
+.meta b{color:var(--ink);font-weight:400}
+
+/* ── 职业卡牌 ─────────────────────────────── */
+.deck-hd{display:flex;align-items:center;gap:10px;margin:22px 0 9px}
+.deck-hd h2{font-size:14px;margin:0;font-weight:400;letter-spacing:.08em}
+.deck-hd .rule{flex:1;height:0;border-top:2px dashed var(--line-dark)}
+.deck-hd .tip{font-size:11px;color:var(--ink-dim)}
+.deck{
+  display:grid;grid-template-columns:repeat(8,1fr);gap:10px;
+}
+.jcard{
+  position:relative;background:var(--bg-panel);
+  border:2px solid var(--line-dark);
+  padding:6px 6px 7px;text-align:center;
+  transition:transform .16s ease,border-color .2s,box-shadow .2s,background .2s;
+  box-shadow:3px 3px 0 var(--line);
+  display:flex;flex-direction:column;gap:5px;min-width:0;
+}
+.jcard .av{
+  aspect-ratio:3/5;
+  background-image:url('../img/job-chain.png');
+  background-repeat:no-repeat;
+  background-size:1300% auto;
+  background-position:var(--bx) 84.6%;
+  image-rendering:pixelated;
+  border:1px solid var(--line);
+  filter:saturate(.85);
+  transition:filter .25s;
+}
+.jcard.all .av{
+  background-image:url('../img/portrait-alt.png');
+  background-size:cover;background-position:50% 12%;
+}
+.jcard .nm{font-size:11px;line-height:1.25;letter-spacing:.02em}
+.jcard .ln{font-size:9.5px;color:var(--ink-dim)}
+.jcard .cnt{
+  position:absolute;top:-2px;right:-2px;
+  background:var(--jc);color:#fffaf0;font-size:9.5px;
+  padding:0 4px;line-height:15px;min-width:16px;
+}
+.jcard:hover,.jcard:focus-visible{transform:translate(-2px,-3px);border-color:var(--jc);box-shadow:5px 6px 0 color-mix(in srgb,var(--jc) 30%,var(--line));outline:none}
+.jcard:hover .av,.jcard:focus-visible .av{filter:saturate(1.15)}
+.jcard[aria-pressed="true"]{
+  border-color:var(--jc);background:color-mix(in srgb,var(--jc) 12%,var(--bg-panel));
+  box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--jc) 34%,transparent),4px 4px 0 color-mix(in srgb,var(--jc) 40%,var(--line));
+  transform:translate(-1px,-2px);
+}
+.jcard[aria-pressed="true"]::after{
+  content:'▲';position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);
+  color:var(--jc);font-size:10px;line-height:1;
+}
+.jcard .side{
+  position:absolute;top:-2px;left:-2px;background:var(--line-dark);color:#fffaf0;
+  font-size:9px;padding:0 3px;line-height:14px;
+}
+
+/* ── 技能树 ───────────────────────────────── */
+.tree-hd{display:flex;align-items:center;gap:10px;margin:34px 0 6px;flex-wrap:wrap}
+.tree-hd h2{font-size:14px;margin:0;font-weight:400;letter-spacing:.08em}
+.tree-hd .rule{flex:1;height:0;border-top:2px dashed var(--line-dark);min-width:30px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10.5px;color:var(--ink-dim);margin:0 0 8px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:11px;height:11px;display:inline-block;border:1.5px solid var(--ink-dim)}
+.legend i.m{background:var(--ink-dim);border-color:var(--ink-dim)}
+.legend i.t{background:none;border-style:dashed}
+.legend .swipe{display:none;color:var(--orange)}
+@media (max-width:1000px){ .legend .swipe{display:inline-flex} }
+
+.scroller{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+  border:3px solid var(--line-dark);background:var(--bg-panel);box-shadow:5px 5px 0 var(--line)}
+.stage{min-width:920px;padding:18px 16px}
+.canvas{position:relative;height:clamp(760px,62vw,880px)}
+.edges{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.edges path{fill:none;stroke-linecap:round}
+.edges .spine{stroke:var(--line-dark);stroke-width:5}
+.edges .rib{stroke:var(--line-dark);stroke-width:2.5;transition:stroke .3s,opacity .3s}
+.edges .rib.dim{opacity:.13}
+.edges .rib.lit{stroke:var(--rc)}
+.anim .edges .spine{animation:grow .75s ease both}
+.anim .edges .rib{animation:grow .5s ease both;animation-delay:.5s}
+@keyframes grow{from{opacity:0}to{opacity:1}}
+
+.node{
+  position:absolute;left:calc(var(--x)*1%);top:calc(var(--y)*1%);
+  transform:translate(-50%,-50%);
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
+  padding:4px 9px;font-size:11px;line-height:1.35;
+  border:2px solid var(--nc);background:var(--bg-panel);color:var(--ink);
+  transition:opacity .28s,filter .28s,box-shadow .2s,background .28s;
+  cursor:default;
+}
+.node .dot{width:7px;height:7px;background:var(--nc);flex:none}
+.node[data-st="mastered"]{background:color-mix(in srgb,var(--nc) 16%,var(--bg-panel));box-shadow:2px 2px 0 color-mix(in srgb,var(--nc) 34%,transparent)}
+.node[data-st="training"]{border-style:dashed;color:var(--ink-dim)}
+.node[data-st="training"] .dot{background:none;border:2px solid var(--nc);width:8px;height:8px}
+.node .src{font-size:9px;color:var(--ink-dim);opacity:0;transition:opacity .2s;max-width:0;overflow:hidden}
+.node:hover{z-index:9;box-shadow:0 0 0 3px color-mix(in srgb,var(--nc) 25%,transparent)}
+.node:hover .src{opacity:1;max-width:120px;margin-left:2px}
+.node.dim{opacity:.13;filter:grayscale(1)}
+.node.pop{animation:pop .38s cubic-bezier(.2,1.55,.45,1) backwards;animation-delay:calc(var(--i)*45ms)}
+@keyframes pop{
+  from{transform:translate(-50%,-50%) scale(.55);opacity:0}
+  60%{transform:translate(-50%,-50%) scale(1.09)}
+  to{transform:translate(-50%,-50%) scale(1)}
+}
+.node[data-st="training"].lit .dot{animation:blip 1.6s ease-in-out infinite}
+@keyframes blip{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--nc) 60%,transparent)}50%{box-shadow:0 0 0 4px transparent}}
+
+.head{
+  padding:6px 11px;font-size:12.5px;letter-spacing:.06em;
+  border-width:3px;background:var(--bg-panel);
+  box-shadow:3px 3px 0 color-mix(in srgb,var(--nc) 30%,transparent);
+}
+.head img{width:22px;height:22px;border:1px solid var(--line)}
+.root{padding:5px 10px;border-style:solid;border-color:var(--line-dark);background:#f2e7d0}
+.root img{width:18px;height:18px;border:1px solid var(--line)}
+.root .tag{font-size:9px;color:var(--ink-dim)}
+.rootnote{font-size:10.5px;color:var(--ink-dim);margin:8px 2px 0}
+
+/* ── 取舍 ─────────────────────────────────── */
+.tradeoff{margin:34px 0 46px;border:3px solid var(--line-dark);background:var(--bg-panel);padding:16px 20px 18px;box-shadow:5px 5px 0 var(--line)}
+.tradeoff h2{font-size:13px;margin:0 0 10px;font-weight:400;letter-spacing:.08em}
+.tradeoff ul{margin:0;padding:0;list-style:none;display:grid;gap:9px}
+.tradeoff li{font-size:12px;padding-left:22px;position:relative;color:var(--ink)}
+.tradeoff li::before{position:absolute;left:0;top:0;font-size:11px}
+.tradeoff li.pro::before{content:'▲';color:var(--green)}
+.tradeoff li.con::before{content:'▼';color:var(--red)}
+.tradeoff li b{font-weight:400;color:var(--orange)}
+
+/* ── 响应式 ───────────────────────────────── */
+@media (max-width:940px){
+  .deck{grid-template-columns:repeat(4,1fr)}
+}
+@media (max-width:760px){
+  .charbox{grid-template-columns:1fr}
+  .portrait{border-right:0;border-bottom:3px solid var(--line-dark);
+    display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center}
+  .portrait .plate{align-self:center}
+  .who h1{font-size:24px}
+  .card{padding:14px 15px}
+}
+@media (max-width:480px){
+  .deck{grid-template-columns:repeat(3,1fr);gap:8px}
+  .jcard .ln{display:none}
+  .topbar .wrap{padding-top:7px;padding-bottom:7px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition-duration:.001ms!important}
+  .anim .edges path{stroke-dashoffset:0}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <b>方案 C · 角色选择大厅（Character Select）</b>
+  <span>把 7 个身份做成 7 张可选职业卡：选谁，立绘就换谁的色、称号换谁的名、属性条重新分配、技能树只亮谁点过的那些。</span>
+</div></div>
+
+<div class="wrap">
+
+<!-- ══ HERO：角色面板 ══ -->
+<section class="hero">
+  <div class="panel charbox">
+    <div class="portrait" id="pt">
+      <div class="frame"><img id="pimg" src="../img/portrait.png" alt="王彪的像素立绘：戴草帽、戴眼镜、拿着手柄"></div>
+      <div class="plate">当前职业 · <b id="pjob">全部</b></div>
+    </div>
+
+    <div class="card">
+      <div class="who">
+        <h1>王&nbsp;彪</h1>
+        <div class="en">WANG&nbsp;BIAO</div>
+      </div>
+      <div class="title-row">
+        <span class="badge" id="ttl">游戏农民工 Lv.∞</span>
+        <span class="era" id="era">2007 — 至今 · 12 段章节</span>
+      </div>
+      <p class="line" id="quote">白手起家，主线做游戏，支线比主线还长。转职十余次，还在转。</p>
+
+      <div class="stats">
+        <div class="stat" style="--sc:var(--blue)"><span class="lb">数据</span><div class="bar"><i data-k="d"></i></div><b class="val" data-v="d">0</b></div>
+        <div class="stat" style="--sc:var(--pink)"><span class="lb">创作</span><div class="bar"><i data-k="c"></i></div><b class="val" data-v="c">0</b></div>
+        <div class="stat" style="--sc:var(--green)"><span class="lb">商业</span><div class="bar"><i data-k="b"></i></div><b class="val" data-v="b">0</b></div>
+      </div>
+
+      <div class="meta">关联章节 <b id="chap">全部 12 段</b> ｜ 本职解锁技能 <b id="cnt">28</b> / 28</div>
+    </div>
+  </div>
+
+  <!-- ══ 职业卡牌 ══ -->
+  <div class="deck-hd">
+    <h2>选择职业</h2>
+    <span class="tip">点一张卡换装 · 悬停可预览</span>
+    <span class="rule"></span>
+  </div>
+  <div class="deck" id="deck" role="group" aria-label="职业选择"></div>
+</section>
+
+<!-- ══ 技能树 ══ -->
+<div class="tree-hd">
+  <h2>技能树 · 28 枚</h2>
+  <span class="rule"></span>
+</div>
+<p class="legend">
+  <span><i class="m"></i>已点亮</span>
+  <span><i class="t"></i>修炼中</span>
+  <span>节点颜色 = 这枚技能是哪个身份给的</span>
+  <span>树干向上分三支：数据·技术 / 创作 / 商业·江湖</span>
+  <span class="swipe">← 树比屏幕宽，左右拖动看全 →</span>
+</p>
+
+<div class="scroller">
+  <div class="stage">
+    <div class="canvas" id="canvas">
+      <svg class="edges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <g class="spines">
+          <path class="spine" vector-effect="non-scaling-stroke" d="M50 84 C50 80 50 75 50 69"/>
+          <path class="spine" vector-effect="non-scaling-stroke" d="M50 69 C42 70 24 68 18 58"/>
+          <path class="spine" vector-effect="non-scaling-stroke" d="M50 69 C58 70 76 68 82 58"/>
+          <path class="spine" vector-effect="non-scaling-stroke" d="M18 58 C16 46 16 24 17 4"/>
+          <path class="spine" vector-effect="non-scaling-stroke" d="M50 62 C51 46 49 22 50 3"/>
+          <path class="spine" vector-effect="non-scaling-stroke" d="M82 58 C84 46 84 24 83 4"/>
+          <path class="spine" vector-effect="non-scaling-stroke" d="M50 84 C46 87 32 88 21 90"/>
+          <path class="spine" vector-effect="non-scaling-stroke" d="M50 84 C50 86 50 88 50 90"/>
+          <path class="spine" vector-effect="non-scaling-stroke" d="M50 84 C54 87 68 88 79 90"/>
+        </g>
+        <g class="ribs" id="ribs"></g>
+      </svg>
+    </div>
+  </div>
+</div>
+<p class="rootnote">※ 根系那三枚（统计建模 / 尽调与估值 / 商业计划与路演）来自亚利桑那与 INSEAD——这两段没有对应的身份标签，所以它们不归任何职业，常亮不灭。</p>
+
+<!-- ══ 取舍 ══ -->
+<section class="tradeoff">
+  <h2>本方案取舍</h2>
+  <ul>
+    <li class="pro"><b>第一眼就懂在看什么。</b>「选人界面」是几乎所有人都见过的界面语言，7 段经历直接翻译成 7 张卡，访客不用读一个字就知道"这人身份很多"，把"经历超杂"从负担变成卖点。</li>
+    <li class="pro"><b>换装反馈把履历变成玩具。</b>立绘换色 + 称号改写 + 三条属性条动画重排 + 树上技能逐枚弹出，四个反馈同时发生，让人有把 8 张卡全点一遍的冲动——停留时长是这个方案真正的产出。</li>
+    <li class="con"><b>技能树被降级成职业的附属。</b>树画出了"谁贡献了什么"，但画不出"能力之间怎么互相长出来的"——比如概率系统设计如何喂养了独立开发，这层因果被职业筛选压掉了。</li>
+    <li class="con"><b>立绘只有一张，职业差异靠滤镜模拟。</b>光环和色调撑得住扫一眼，凑近看会露怯；属性条的数值也是为观感设计的，不是可核验的事实，对严肃的招聘 / 投资读者可能反而减分。</li>
+  </ul>
+</section>
+
+</div><!-- /wrap -->
+
+<script>
+(function(){
+'use strict';
+var RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── 职业数据 ───────────────────────────── */
+/* bx = 从 job-chain.png 横幅里裁出的那个小人的位置 */
+var JOBS = [
+  {id:'all', tag:'全部', nm:'全部身份', ln:'12 段章节', col:'--orange', rot:null,
+   ttl:'游戏农民工 Lv.∞', era:'2007 — 至今 · 12 段章节', chap:'全部 12 段',
+   q:'白手起家，主线做游戏，支线比主线还长。转职十余次，还在转。',
+   st:{d:88,c:76,b:82}, side:''},
+
+  {id:'uber', tag:'#运营专员', nm:'街头增长', ln:'加州淘金', col:'--red', rot:-30, bx:'2.083%',
+   ttl:'街头增长运营 Lv.20', era:'2013 — 2014 · 主线', chap:'加州淘金（Uber 司机增长）',
+   q:'在旧金山的街口一个一个拦司机，把人拉进来。增长这件事，我是从路边学会的。',
+   st:{d:46,c:12,b:82}, side:'主线'},
+
+  {id:'photographer', tag:'#摄影师', nm:'野地摄影', ln:'快门与荒野', col:'--lilac', rot:240, bx:'12.986%',
+   ttl:'野地摄影师 Lv.18', era:'2013 — 2014 · 支线', chap:'快门与荒野（兼职职业摄影师）',
+   q:'相机比学位更早教会我怎么看世界。沙漠、公路、陌生人的脸。',
+   st:{d:10,c:90,b:24}, side:'支线'},
+
+  {id:'netease', tag:'#数据工程师', nm:'数据法师', ln:'网易杭州', col:'--blue', rot:172, bx:'31.667%',
+   ttl:'数据法师 Lv.55', era:'2014 — 2019 · 主线', chap:'数据法师的修行（网易杭州）',
+   q:'在杭州修行五年，从数仓一路做到概率系统——把玩家的"运气"亲手写进配置表。',
+   st:{d:96,c:32,b:38}, side:'主线'},
+
+  {id:'metaarteek', tag:'#游戏开发者', nm:'独立开发', ln:'元艺极客', col:'--orange', rot:-8, bx:'42.222%',
+   ttl:'独立开发者 Lv.50', era:'2023 — 2025 · 主线', chap:'独立开发者（元艺极客）',
+   q:'六款小游戏 + 一款上架 itch.io。代码、美术、配乐、播客，全是自己一个人。',
+   st:{d:74,c:78,b:32}, side:'主线'},
+
+  {id:'offcircle', tag:'#创业者', nm:'自立门户', ln:'OFF-CIRCLE', col:'--green', rot:64, bx:'52.153%',
+   ttl:'工作室主理人 Lv.60', era:'2025 — 至今 · 主线', chap:'自立门户（OFF-CIRCLE 超元工作室）',
+   q:'从画画到编曲到带人到接单，全线重开一遍。这一格的技能最多，也最多是"修炼中"。',
+   st:{d:68,c:92,b:70}, side:'主线'},
+
+  {id:'accenture', tag:'#管理咨询顾问', nm:'战略雇佣兵', ln:'埃森哲香港', col:'--teal', rot:122, bx:'92.222%',
+   ttl:'战略雇佣兵 Lv.45', era:'2020 — 2023 · 主线', chap:'雇佣兵篇（埃森哲战略 · 香港）',
+   q:'香港三年替别人打仗，顺便学会了怎么打仗，以及怎么跟出钱的人说话。',
+   st:{d:42,c:20,b:94}, side:'主线'},
+
+  {id:'insurance', tag:'#保险经理人', nm:'风险规划', ln:'AIA 友邦', col:'--pink', rot:302, bx:'61.944%',
+   ttl:'保险经理人 Lv.5', era:'2026 — 至今 · 支线', chap:'保险经理人（AIA）',
+   /* 横幅最右那个小人会被裁边，改用手里拿着文件的那一个 */
+   q:'最新的一次转职，老老实实还在新手村。这一格只有一枚技能，而且是修炼中。',
+   st:{d:32,c:14,b:76}, side:'支线'}
+];
+var BY = {}; JOBS.forEach(function(j){BY[j.id]=j;});
+
+/* ── 技能树节点 ─────────────────────────── */
+/* br: L=数据·技术  M=创作  R=商业·江湖  |  x,y 为 0-100 坐标系 */
+var NODES = [
+  /* 分支头（大节点，常亮） */
+  {t:'head', n:'数据·技术', x:18, y:57, ic:'i-08', col:'--blue'},
+  {t:'head', n:'创　　作',   x:50, y:59, ic:'i-10', col:'--pink'},
+  {t:'head', n:'商业·江湖', x:82, y:57, ic:'i-21', col:'--green'},
+
+  /* 根系（无身份归属，常亮） */
+  {t:'root', n:'统计建模',     x:21, y:90, ic:'i-03', src:'亚利桑那'},
+  {t:'root', n:'尽调与估值',   x:50, y:90, ic:'i-14', src:'INSEAD'},
+  {t:'root', n:'商业计划与路演',x:79, y:90, ic:'i-09', src:'INSEAD'},
+
+  /* 左：数据·技术（9） */
+  {ch:'uber',      n:'取数与实验设计', st:'mastered', br:'L', x:7,  y:50},
+  {ch:'netease',   n:'数仓与ETL',     st:'mastered', br:'L', x:28, y:45},
+  {ch:'netease',   n:'挖掘与推荐',     st:'mastered', br:'L', x:7,  y:40},
+  {ch:'netease',   n:'用研与A/B',     st:'mastered', br:'L', x:28, y:35},
+  {ch:'netease',   n:'数据产品化',     st:'mastered', br:'L', x:7,  y:30},
+  {ch:'netease',   n:'概率系统设计',   st:'mastered', br:'L', x:28, y:25},
+  {ch:'metaarteek',n:'Unity全栈开发',  st:'mastered', br:'L', x:7,  y:20},
+  {ch:'offcircle', n:'AIGC工具链',     st:'training', br:'L', x:28, y:15},
+  {ch:'offcircle', n:'Agent编排',      st:'training', br:'L', x:7,  y:10},
+
+  /* 中：创作（9） */
+  {ch:'photographer',n:'摄影与修图',   st:'mastered', br:'M', x:40, y:48},
+  {ch:'metaarteek', n:'长文写作',      st:'mastered', br:'M', x:60, y:43},
+  {ch:'metaarteek', n:'播客制作',      st:'mastered', br:'M', x:40, y:38},
+  {ch:'metaarteek', n:'游戏配乐与音效', st:'training', br:'M', x:60, y:33},
+  {ch:'offcircle',  n:'素描基本功',    st:'mastered', br:'M', x:40, y:28},
+  {ch:'offcircle',  n:'扒谱与打谱',    st:'mastered', br:'M', x:60, y:23},
+  {ch:'offcircle',  n:'声乐与视唱',    st:'training', br:'M', x:40, y:18},
+  {ch:'offcircle',  n:'编曲与混音',    st:'training', br:'M', x:60, y:13},
+  {ch:'offcircle',  n:'数字绘画',      st:'training', br:'M', x:40, y:8},
+
+  /* 右：商业·江湖（7） */
+  {ch:'uber',      n:'街头地推',       st:'mastered', br:'R', x:92, y:48},
+  {ch:'uber',      n:'增长漏斗运营',   st:'mastered', br:'R', x:72, y:42},
+  {ch:'accenture', n:'战略咨询',       st:'mastered', br:'R', x:92, y:36},
+  {ch:'accenture', n:'BD与大客沟通',   st:'mastered', br:'R', x:72, y:30},
+  {ch:'offcircle', n:'商业情报',       st:'training', br:'R', x:92, y:24},
+  {ch:'offcircle', n:'团队组建与带人', st:'training', br:'R', x:72, y:18},
+  {ch:'insurance', n:'保险与风险规划', st:'training', br:'R', x:92, y:12}
+];
+var SPINE_X = {L:17.2, M:50, R:82.8};
+
+/* ── 渲染职业卡牌 ───────────────────────── */
+var deck = document.getElementById('deck');
+JOBS.forEach(function(j){
+  var count = (j.id==='all') ? NODES.filter(function(n){return !n.t;}).length + 3
+                             : NODES.filter(function(n){return n.ch===j.id;}).length;
+  var b = document.createElement('button');
+  b.type='button';
+  b.className = 'jcard' + (j.id==='all' ? ' all' : '');
+  b.dataset.id = j.id;
+  b.setAttribute('aria-pressed', j.id==='all' ? 'true':'false');
+  b.style.setProperty('--jc','var('+j.col+')');
+  if(j.bx) b.style.setProperty('--bx', j.bx);
+  b.innerHTML =
+    (j.side ? '<span class="side">'+j.side+'</span>' : '') +
+    '<span class="cnt">'+count+'</span>' +
+    '<span class="av"></span>' +
+    '<span class="nm">'+j.tag+'</span>' +
+    '<span class="ln">'+j.ln+'</span>';
+  deck.appendChild(b);
+});
+
+/* ── 渲染技能树 ─────────────────────────── */
+var canvas = document.getElementById('canvas');
+var ribs   = document.getElementById('ribs');
+var SVGNS  = 'http://www.w3.org/2000/svg';
+var nodeEls = [], ribEls = [];
+
+NODES.forEach(function(n){
+  var el = document.createElement('div');
+  el.className = 'node' + (n.t==='head' ? ' head' : '') + (n.t==='root' ? ' root' : '');
+  el.style.setProperty('--x', n.x);
+  el.style.setProperty('--y', n.y);
+  var col = n.col || (n.ch ? BY[n.ch].col : '--ink-dim');
+  el.style.setProperty('--nc','var('+col+')');
+  if(n.st) el.dataset.st = n.st;
+  if(n.ch) el.dataset.ch = n.ch;
+  if(n.t)  el.dataset.fixed = '1';
+
+  var inner = '';
+  if(n.ic) inner += '<img src="../img/icons/'+n.ic+'.png" alt="">';
+  else     inner += '<span class="dot"></span>';
+  inner += '<span>'+n.n+'</span>';
+  if(n.t==='root') inner += '<span class="tag">'+n.src+'</span>';
+  else if(n.ch)    inner += '<span class="src">'+BY[n.ch].tag+'</span>';
+  el.innerHTML = inner;
+  el.title = n.t ? n.n : (n.n + ' · 来自 ' + BY[n.ch].tag + ' · ' + (n.st==='mastered'?'已点亮':'修炼中'));
+  canvas.appendChild(el);
+  nodeEls.push({el:el, d:n});
+
+  /* 肋骨：从主干在同高度处伸出一根小枝到节点 —— 结构上零交叉 */
+  if(n.br){
+    var sx = SPINE_X[n.br], lx = n.x, y = n.y, mid = (sx+lx)/2;
+    var p = document.createElementNS(SVGNS,'path');
+    p.setAttribute('class','rib');
+    p.setAttribute('pathLength','1');
+    p.setAttribute('vector-effect','non-scaling-stroke');
+    p.setAttribute('d','M '+sx+' '+(y+4.5)+' C '+sx+' '+(y+1)+' '+mid+' '+y+' '+lx+' '+y);
+    p.style.setProperty('--rc','var('+BY[n.ch].col+')');
+    ribs.appendChild(p);
+    ribEls.push({el:p, ch:n.ch});
+  }
+});
+
+/* ── 状态切换 ───────────────────────────── */
+var pt    = document.getElementById('pt');
+var pimg  = document.getElementById('pimg');
+var pjob  = document.getElementById('pjob');
+var ttl   = document.getElementById('ttl');
+var era   = document.getElementById('era');
+var quote = document.getElementById('quote');
+var chap  = document.getElementById('chap');
+var cntEl = document.getElementById('cnt');
+var bars  = {d:document.querySelector('[data-k="d"]'), c:document.querySelector('[data-k="c"]'), b:document.querySelector('[data-k="b"]')};
+var vals  = {d:document.querySelector('[data-v="d"]'), c:document.querySelector('[data-v="c"]'), b:document.querySelector('[data-v="b"]')};
+var shown = {d:0,c:0,b:0};
+var tweenId = null, tweenGuard = null;
+var KEYS = ['d','c','b'];
+
+function snap(target){
+  KEYS.forEach(function(k){ shown[k]=target[k]; vals[k].textContent=target[k]; });
+}
+function tween(target){
+  if(tweenId){ cancelAnimationFrame(tweenId); tweenId=null; }
+  if(tweenGuard){ clearTimeout(tweenGuard); tweenGuard=null; }
+  if(RM){ snap(target); return; }
+  var from = {d:shown.d, c:shown.c, b:shown.b}, t0 = null, dur = 520;
+  function step(ts){
+    if(t0===null) t0 = ts;
+    var p = Math.min(1,(ts-t0)/dur), e = 1-Math.pow(1-p,3);
+    KEYS.forEach(function(k){
+      var v = Math.round(from[k] + (target[k]-from[k])*e);
+      shown[k]=v; vals[k].textContent=v;
+    });
+    if(p<1){ tweenId = requestAnimationFrame(step); } else { tweenId=null; }
+  }
+  tweenId = requestAnimationFrame(step);
+  /* 兜底：标签页在后台时 rAF 会被冻结，到点直接落到终值，数字不会停在半路 */
+  tweenGuard = setTimeout(function(){
+    if(tweenId){ cancelAnimationFrame(tweenId); tweenId=null; }
+    snap(target);
+  }, dur + 160);
+}
+
+var current = 'all';
+
+function apply(id){
+  var j = BY[id];
+  document.documentElement.style.setProperty('--c','var('+j.col+')');
+
+  pimg.style.filter = (j.rot===null) ? 'none'
+    : 'sepia(.28) saturate(1.15) hue-rotate('+(j.rot*0.22)+'deg) contrast(1.03) brightness(1.02)';
+
+  pjob.textContent  = j.nm;
+  ttl.textContent   = j.ttl;
+  era.textContent   = j.era;
+  quote.textContent = j.q;
+  chap.textContent  = j.chap;
+
+  ['d','c','b'].forEach(function(k){ bars[k].style.width = j.st[k] + '%'; });
+  tween(j.st);
+
+  /* 技能树点亮 */
+  var i = 0, lit = 0;
+  nodeEls.forEach(function(o){
+    var fixed = !!o.d.t;                       /* 分支头与根系永不熄灭 */
+    var on = (id==='all') || fixed || (o.d.ch === id);
+    o.el.classList.toggle('dim', !on);
+    o.el.classList.toggle('lit', on && !fixed);
+    o.el.classList.remove('pop');
+    if(on && !fixed && !RM){
+      lit++;
+      /* 重排一次以重启动画 */
+      void o.el.offsetWidth;
+      o.el.style.setProperty('--i', i++);
+      o.el.classList.add('pop');
+    } else if(on && !fixed){ lit++; }
+  });
+  ribEls.forEach(function(r){
+    var on = (id==='all') || (r.ch === id);
+    r.el.classList.toggle('dim', !on);
+    r.el.classList.toggle('lit', on);
+  });
+  cntEl.textContent = (id==='all') ? 28 : lit;
+}
+
+function commit(id){
+  current = id;
+  Array.prototype.forEach.call(deck.children, function(b){
+    b.setAttribute('aria-pressed', b.dataset.id===id ? 'true' : 'false');
+  });
+  apply(id);
+}
+
+/* 点击 = 确定换装；悬停 / 聚焦 = 预览，离开还原 */
+deck.addEventListener('click', function(e){
+  var b = e.target.closest('.jcard'); if(!b) return;
+  commit(b.dataset.id);
+});
+var fine = !window.matchMedia || window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+if(fine){
+  deck.addEventListener('mouseover', function(e){
+    var b = e.target.closest('.jcard'); if(!b) return;
+    if(b.dataset.id !== current) apply(b.dataset.id);
+  });
+  deck.addEventListener('mouseleave', function(){ apply(current); });
+  deck.addEventListener('focusin', function(e){
+    var b = e.target.closest('.jcard'); if(b && b.dataset.id!==current) apply(b.dataset.id);
+  });
+  deck.addEventListener('focusout', function(e){
+    if(!deck.contains(e.relatedTarget)) apply(current);
+  });
+}
+/* 左右方向键在卡牌间移动 */
+deck.addEventListener('keydown', function(e){
+  if(e.key!=='ArrowRight' && e.key!=='ArrowLeft') return;
+  var list = Array.prototype.slice.call(deck.children);
+  var i = list.indexOf(document.activeElement); if(i<0) return;
+  e.preventDefault();
+  list[(i + (e.key==='ArrowRight'?1:list.length-1)) % list.length].focus();
+});
+
+/* 首次绘制 */
+if(!RM) canvas.parentElement.parentElement.classList.add('anim');
+commit('all');
+})();
+</script>
+</body>
+</html>
