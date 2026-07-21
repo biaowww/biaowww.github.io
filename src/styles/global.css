@@ -241,13 +241,13 @@ img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
   transition: opacity .25s, transform .25s steps(3), border-color .15s;
 }
 .skill.shown { opacity: 1; transform: none; }
-.skill.shown:hover { border-color: var(--green); transform: translate(-2px, -2px); }
+/* hover 时的 transform 会新建层叠上下文，若不抬 z-index，提示框会被后面的同级技能盖住 */
+.skill.shown:hover { border-color: var(--green); transform: translate(-2px, -2px); z-index: 30; }
 .skill .ico {
   width: 26px; height: 26px; flex: none;
-  background-image: var(--icon-sheet);
-  background-size: 500% 500%;
   image-rendering: pixelated;
   border: 1px solid var(--line-dark);
+  object-fit: contain;
 }
 @media (prefers-reduced-motion: reduce) {
   .skill { opacity: 1; transform: none; transition: none; }
@@ -258,9 +258,9 @@ img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
 .skill.training .sk-state { background: var(--orange); }
 .skill.training { border-style: dashed; }
 .skill .sk-tip {
-  display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px);
-  z-index: 20; background: var(--ink); color: #f7f1e5;
-  font-size: .68rem; line-height: 1.6; padding: 7px 9px;
+  display: none; position: absolute; left: -6px; right: -6px; top: calc(100% + 4px);
+  z-index: 40; background: var(--ink); color: #f7f1e5;
+  font-size: .68rem; line-height: 1.6; padding: 8px 10px;
   box-shadow: 3px 3px 0 rgba(0,0,0,.18);
 }
 .skill:hover .sk-tip { display: block; }

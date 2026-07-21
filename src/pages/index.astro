@@ -60,8 +60,7 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/fusion-pixel-12px-proportional-zh_hans@2025.5.14/font.min.css"
     />
-    <style is:inline set:html={`:root{--icon-sheet:url('${base}img/skill-icons.png')}
-      body{font-family:'fusion-pixel-12px-proportional-zh_hans',ui-monospace,'Microsoft YaHei',monospace}`}></style>
+    <style is:inline set:html={`body{font-family:'fusion-pixel-12px-proportional-zh_hans',ui-monospace,'Microsoft YaHei',monospace}`}></style>
   </head>
   <body>
     <!-- 0 · 标题画面 -->
@@ -189,10 +188,14 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
                 <div class="tier-label">{t.label}</div>
                 {t.skills.map((sk) => (
                   <div class={`skill ${sk.state}`} data-skill>
-                    <span
+                    <img
                       class="ico"
-                      style={`background-position: ${sk.icon[1] * 25}% ${sk.icon[0] * 25}%`}
-                    ></span>
+                      src={`${base}img/icons/i-${String(sk.icon[0] * 5 + sk.icon[1]).padStart(2, '0')}.png`}
+                      alt=""
+                      width="26"
+                      height="26"
+                      loading="lazy"
+                    />
                     <span class="sk-name">{sk.name}</span>
                     <span class="sk-state">{stateLabel[sk.state]}</span>
                     <span class="sk-tip">
