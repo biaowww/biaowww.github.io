@@ -6,7 +6,7 @@
   ],
   "chapters": [
     {
-      "id": "chengdu", "act": "I",
+      "id": "chengdu", "act": "I", "side": false,
       "chapter": "第一章", "title": "人生巅峰", "loc": "成都", "years": "??—2007",
       "lines": [
         "考上成都七中，达成本作最高成就。",
@@ -14,7 +14,7 @@
       ]
     },
     {
-      "id": "wuhan", "act": "I",
+      "id": "wuhan", "act": "I", "side": false,
       "chapter": "第二章", "title": "新手村", "loc": "武汉 · 华中科技大学", "years": "2007—2011",
       "lines": [
         "循规蹈矩的读书人路线：上课、考试、点工科技能树。",
@@ -22,7 +22,7 @@
       ]
     },
     {
-      "id": "arizona", "act": "I",
+      "id": "arizona", "act": "I", "side": false,
       "chapter": "第三章", "title": "沙漠副本 · 直博", "loc": "美国 · 亚利桑那", "years": "2011—2013",
       "lines": [
         "沿着既定轨道走到头：本科毕业直接赴美直博。",
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "id": "uber", "act": "II",
+      "id": "uber", "act": "II", "side": false,
       "chapter": "第四章", "title": "加州淘金", "loc": "加州 · Uber", "years": "2013—2014",
       "lines": [
         "退学后的落点：Uber 司机增长运营（Driver Operations）。互联网、初创公司、大数据——三重刺激一次拉满。",
@@ -40,15 +40,16 @@
       ]
     },
     {
-      "id": "photographer", "act": "II",
-      "chapter": "隐藏支线", "title": "快门与荒野", "loc": "加州", "years": "2013—2014",
+      "id": "photographer", "act": "II", "side": true,
+      "chapter": "并行支线", "title": "快门与荒野", "loc": "加州 · 与 Uber 同期", "years": "2013—2014",
       "lines": [
-        "Uber 之外的兼职身份：职业摄影师。",
-        "第一次靠「创作」而不是「答题」赚到钱——这个存档点，多年后回看才知道有多重要。"
+        "和 Uber 那份主业并行跑着的一条支线：兼职职业摄影师。",
+        "严格说它算不上「第一份职业」，但它是第一次靠「创作」而不是「答题」赚到钱。",
+        "这个存档点当时毫不起眼，多年后回看才知道埋了什么伏笔。"
       ]
     },
     {
-      "id": "netease", "act": "II",
+      "id": "netease", "act": "II", "side": false,
       "chapter": "第五章", "title": "数据法师的修行", "loc": "杭州 · 网易游戏", "years": "2014—2019",
       "lines": [
         "作为第一代数据人入行，正赶上中国移动游戏腾飞的头班车——此后十年，我的职业生涯和这条曲线同频共振。",
@@ -57,23 +58,23 @@
       ]
     },
     {
-      "id": "quantic", "act": "II",
-      "chapter": "隐藏支线", "title": "底特律：变人类顾问", "loc": "巴黎 · Quantic Dream", "years": "2019.3—12",
+      "id": "quantic", "act": "II", "side": true,
+      "chapter": "海外支线", "title": "底特律：变人类顾问", "loc": "巴黎 · Quantic Dream", "years": "2019.3—12",
       "lines": [
         "在做《底特律：变人》的工作室里，当一名线上 + 驻场的外部顾问。",
         "在世界顶级叙事工作室里，看清了游戏工业的天花板长什么样。"
       ]
     },
     {
-      "id": "insead", "act": "II",
+      "id": "insead", "act": "II", "side": false,
       "chapter": "第六章", "title": "氪金重开", "loc": "枫丹白露 / 新加坡 · INSEAD MBA", "years": "2019—2020",
       "lines": [
         "一年学费，换一张几乎点满的世界地图：欧洲、非洲、南亚、东南亚、大洋洲。",
-        "支线任务：飞去肯尼亚给创业公司当实习生（ALX），在赤道上写商业计划书。"
+        "顺手接了个赤道任务：飞去肯尼亚给创业公司 ALX 当实习生，在非洲写商业计划书。"
       ]
     },
     {
-      "id": "accenture", "act": "II",
+      "id": "accenture", "act": "II", "side": false,
       "chapter": "第七章", "title": "雇佣兵篇", "loc": "香港 · 埃森哲战略", "years": "2020—2023",
       "lines": [
         "转职战略顾问，给大厂当军师，把 PPT 练成副职业满级。",
@@ -81,7 +82,7 @@
       ]
     },
     {
-      "id": "metaarteek", "act": "III",
+      "id": "metaarteek", "act": "III", "side": false,
       "chapter": "第八章", "title": "独立开发者", "loc": "元艺极客 MetaARTeek", "years": "2023—2025",
       "lines": [
         "裸辞下场。一个人（+偶尔的伙伴）包办设计、代码、美术、音乐：6 款微信小游戏 + 1 款 itch.io 上线，巅峰 DAU 3000，周流水 ¥3000。",
@@ -90,7 +91,7 @@
       ]
     },
     {
-      "id": "offcircle", "act": "III",
+      "id": "offcircle", "act": "III", "side": false,
       "chapter": "当前主线", "title": "自立门户", "loc": "香港 / 成都 · OFF-CIRCLE 超元", "years": "2025—NOW",
       "lines": [
         "创办游戏工作室，目标是一家 AI-native 的游戏公司——作为第一代数据人，见证了 AI 的崛起，这次要当真正的使用者。",
@@ -98,10 +99,10 @@
       ]
     },
     {
-      "id": "insurance", "act": "III",
+      "id": "insurance", "act": "III", "side": true,
       "chapter": "新支线", "title": "保险经理人", "loc": "香港 · AIA", "years": "2026—NOW",
       "lines": [
-        "2026 年新开的大型支线：持牌保险经纪。",
+        "2026 年新开的一条支线：持牌保险经纪。",
         "任务日志刚写了几页，战利品栏暂时空着——敬请期待版本更新。"
       ]
     }

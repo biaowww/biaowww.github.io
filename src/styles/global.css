@@ -155,10 +155,121 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 .chapter .rail { width: 4px; background: var(--line); margin: 6px auto 0; min-height: 40px; }
 .chapter-head .tag { font-size: .7rem; color: var(--orange); letter-spacing: .15em; }
 .chapter-head .tag.side { color: var(--blue); }
+
+/* 支线：虚线轨道 + 缩进 + 侧栏标记，与主线明显区分 */
+.chapter.is-side { margin-left: 30px; }
+.chapter.is-side .node {
+  border-style: dashed;
+  border-color: var(--blue);
+  width: 34px; height: 34px;
+  font-size: .95rem;
+}
+.chapter.is-side.lit .node { border-color: var(--blue); box-shadow: 2px 2px 0 var(--blue); }
+.chapter.is-side .rail { background: none; border-left: 4px dashed var(--line); width: 0; }
+.chapter.is-side .chapter-head h3 { font-size: 1.02rem; color: #5f5850; }
+.chapter.is-side p { font-size: .85rem; }
+.side-badge {
+  display: inline-block; margin-left: 8px;
+  font-size: .6rem; letter-spacing: .12em;
+  color: #fff; background: var(--blue);
+  padding: 0 6px; vertical-align: middle;
+}
 .chapter-head h3 { font-size: 1.15rem; color: var(--ink); margin: 2px 0; }
 .chapter-head .meta { font-size: .78rem; color: var(--ink-dim); margin-bottom: 10px; }
 .chapter p { font-size: .9rem; color: #6b6256; margin-bottom: .4em; }
 .chapter .peak { color: var(--orange); }
+
+/* ============ 1.5 · 角色面板 + 技能树 ============ */
+img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
+
+.char-panel {
+  display: grid; grid-template-columns: 190px 1fr; gap: 26px;
+  align-items: start;
+  background: var(--bg-panel);
+  border: var(--px) solid var(--line);
+  box-shadow: var(--px) var(--px) 0 var(--line-dark);
+  padding: 22px;
+}
+.char-panel .portrait {
+  width: 100%; height: auto; display: block;
+  border: 3px solid var(--line-dark);
+  background: #f6ecd3;
+  cursor: pointer;
+  animation: idle-bob 1.6s steps(1) infinite;
+}
+/* 站立待机：两帧上下微动，像素游戏的 idle 动画 */
+@keyframes idle-bob { 0%, 50% { transform: translateY(0); } 51%, 100% { transform: translateY(2px); } }
+@media (prefers-reduced-motion: reduce) { .char-panel .portrait { animation: none; } }
+.portrait-hint { font-size: .62rem; color: var(--ink-dim); text-align: center; margin-top: 6px; }
+.char-meta .cname { font-size: 1.2rem; letter-spacing: .06em; }
+.char-meta .cclass { font-size: .8rem; color: var(--orange); margin-bottom: 4px; }
+.char-meta .cdesc { font-size: .8rem; color: #6b6256; margin-bottom: 14px; }
+.stat-row { display: flex; align-items: center; gap: 10px; font-size: .74rem; margin-bottom: 6px; }
+.stat-row .sname { width: 76px; color: var(--ink-dim); flex: none; }
+.stat-track { flex: 1; height: 11px; border: 2px solid var(--line-dark); background: var(--bg); padding: 1px; }
+.stat-fill { height: 100%; background: repeating-linear-gradient(90deg, var(--green) 0 6px, #93b784 6px 12px); }
+.stat-fill.o { background: repeating-linear-gradient(90deg, var(--orange) 0 6px, #eaa95c 6px 12px); }
+.stat-fill.b { background: repeating-linear-gradient(90deg, var(--blue) 0 6px, #9ab4d0 6px 12px); }
+.stat-row .sval { width: 42px; text-align: right; color: var(--ink-dim); flex: none; }
+
+.job-chain { margin: 30px 0 8px; }
+.job-chain img { width: 100%; height: auto; display: block; border: 3px solid var(--line); }
+.job-chain figcaption { font-size: .7rem; color: var(--ink-dim); margin-top: 6px; text-align: center; }
+
+.tree-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+.branch { background: var(--bg-panel); border: var(--px) solid var(--line); box-shadow: var(--px) var(--px) 0 var(--line-dark); padding: 16px 14px 20px; }
+.branch h3 { font-size: .95rem; text-align: center; margin-bottom: 2px; }
+.branch .btag { font-size: .64rem; color: var(--ink-dim); text-align: center; display: block; margin-bottom: 14px; }
+.branch.data h3 { color: var(--blue); }
+.branch.craft h3 { color: var(--pink); }
+.branch.biz h3 { color: var(--orange); }
+
+.tier { position: relative; }
+.tier + .tier { margin-top: 4px; padding-top: 12px; }
+.tier + .tier::before {
+  content: ''; position: absolute; top: 0; left: 50%;
+  width: 0; height: 12px; border-left: 4px dotted var(--line-dark);
+}
+.tier-label { font-size: .58rem; color: var(--ink-dim); text-align: center; letter-spacing: .1em; margin-bottom: 6px; }
+
+.skill {
+  display: flex; align-items: center; gap: 9px;
+  border: 2px solid var(--line); background: var(--bg);
+  padding: 5px 8px; margin-bottom: 6px;
+  cursor: help; position: relative;
+  opacity: 0; transform: translateX(-6px);
+  transition: opacity .25s, transform .25s steps(3), border-color .15s;
+}
+.skill.shown { opacity: 1; transform: none; }
+.skill.shown:hover { border-color: var(--green); transform: translate(-2px, -2px); }
+.skill .ico {
+  width: 26px; height: 26px; flex: none;
+  background-image: var(--icon-sheet);
+  background-size: 500% 500%;
+  image-rendering: pixelated;
+  border: 1px solid var(--line-dark);
+}
+@media (prefers-reduced-motion: reduce) {
+  .skill { opacity: 1; transform: none; transition: none; }
+}
+.skill .sk-name { font-size: .76rem; line-height: 1.4; }
+.skill .sk-state { margin-left: auto; font-size: .58rem; flex: none; padding: 0 5px; color: #fff; }
+.skill.mastered .sk-state { background: var(--green); }
+.skill.training .sk-state { background: var(--orange); }
+.skill.training { border-style: dashed; }
+.skill .sk-tip {
+  display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px);
+  z-index: 20; background: var(--ink); color: #f7f1e5;
+  font-size: .68rem; line-height: 1.6; padding: 7px 9px;
+  box-shadow: 3px 3px 0 rgba(0,0,0,.18);
+}
+.skill:hover .sk-tip { display: block; }
+.skill .sk-tip .from { color: var(--orange); }
+
+.tree-legend { display: flex; gap: 18px; justify-content: center; margin-top: 20px; font-size: .72rem; color: var(--ink-dim); flex-wrap: wrap; }
+.tree-legend b { color: #fff; padding: 0 5px; font-size: .6rem; font-weight: normal; }
+.tree-legend b.m { background: var(--green); }
+.tree-legend b.t { background: var(--orange); }
 
 /* ============ 2 · 世界地图 ============ */
 #map .map-grid { display: grid; gap: 2px; justify-content: center; margin: 32px 0 20px; }
@@ -218,8 +329,15 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 footer { text-align: center; color: var(--ink-dim); font-size: .72rem; padding: 60px 20px 80px; }
 footer .c { color: var(--orange); }
 
+@media (max-width: 760px) {
+  .tree-grid { grid-template-columns: 1fr; }
+  .char-panel { grid-template-columns: 130px 1fr; gap: 16px; }
+}
 @media (max-width: 560px) {
   section { padding: 64px 16px; }
   #map .cell { width: 9px; height: 9px; }
   .chapter { grid-template-columns: 44px 1fr; gap: 12px; }
+  .chapter.is-side { margin-left: 14px; }
+  .char-panel { grid-template-columns: 1fr; }
+  .char-panel .portrait { max-width: 200px; margin: 0 auto; }
 }
