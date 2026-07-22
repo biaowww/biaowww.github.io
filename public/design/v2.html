@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>王彪 · 技能星图（v2 重做）</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fusion-pixel-12px-proportional-zh_hans@2025.5.14/font.min.css">
+<style>
+:root{
+  --bg:#f7f1e5; --panel:#fffaf0; --ink:#46403a; --dim:#a2937f;
+  --line:#e4d7c0; --dark:#d3c3a6;
+  --tech:#7d9cc0; --craft:#d494a8; --hu:#e0913e; --green:#7fa470;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);line-height:1.85;overflow-x:hidden;
+  font-family:'fusion-pixel-12px-proportional-zh_hans',ui-monospace,'Microsoft YaHei',monospace}
+.topbar{background:var(--ink);color:#f7f1e5;font-size:.72rem;padding:7px 16px;text-align:center;letter-spacing:.04em}
+.topbar b{color:#f3c98a}
+
+/* ===== HERO ===== */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;overflow:hidden;padding:24px}
+/* 若隐若现的星图背景 */
+.hero .bg{position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;
+  opacity:.16;filter:saturate(.7);animation:breathe 9s ease-in-out infinite;pointer-events:none}
+.hero .bg svg{width:min(1100px,150%);height:auto}
+@keyframes breathe{0%,100%{opacity:.13;transform:scale(1)}50%{opacity:.2;transform:scale(1.03)}}
+.hero .inner{position:relative;z-index:1;max-width:680px}
+.hero h1{font-size:clamp(2.4rem,8vw,4.4rem);letter-spacing:.14em;color:var(--ink);
+  text-shadow:3px 3px 0 rgba(224,145,62,.28)}
+.hero .role{color:var(--dim);font-size:1rem;margin-top:6px}
+.hero .role .hot{color:var(--hu)}
+.tags{display:flex;flex-wrap:wrap;gap:9px 12px;justify-content:center;margin:26px auto 0;max-width:600px}
+.tags .t{font-size:.82rem;padding:2px 12px;border:2px solid var(--line);background:rgba(255,250,240,.7);color:var(--ink);
+  transition:transform .15s steps(2),border-color .15s}
+.tags .t.past{color:var(--dim);text-decoration:line-through;text-decoration-color:var(--hu);
+  text-decoration-thickness:2px;background:transparent;border-style:dashed}
+.tags .t.now{border-color:var(--green);color:var(--ink);box-shadow:2px 2px 0 var(--green)}
+.tags .t:hover{transform:translateY(-2px)}
+.lead{margin-top:26px;font-size:.9rem;color:#6b6256;line-height:2}
+.lead .kw{color:var(--hu)}
+.scroll-hint{position:absolute;bottom:22px;left:50%;translate:-50%;z-index:1;color:var(--dim);font-size:.72rem;
+  animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+/* ===== 星图 section ===== */
+.wrap{max-width:1080px;margin:0 auto;padding:80px 20px}
+.h2{font-size:1.5rem;letter-spacing:.08em;color:var(--hu)}
+.h2::before{content:'✦ ';color:var(--green)}
+.sub{color:var(--dim);font-size:.85rem;margin:4px 0 8px}
+
+.starfield{position:relative;margin-top:26px;background:
+   radial-gradient(120% 90% at 50% 100%, #fffdf7 0%, #fdf6e6 55%, #f4ecd9 100%);
+  border:3px solid var(--line);box-shadow:5px 5px 0 var(--dark)}
+.starfield svg{display:block;width:100%;height:auto}
+/* 连线 */
+.trunk{fill:none;stroke-linecap:round;stroke-linejoin:round;transition:opacity .35s,stroke-width .35s}
+.twig{fill:none;stroke-linecap:round;transition:opacity .35s}
+/* 节点 */
+.node{cursor:default;transition:opacity .35s}
+.node .dot{transition:r .2s,fill .3s,stroke .3s,opacity .3s}
+.node .lbl{font-size:12px;fill:var(--ink);opacity:0;transition:opacity .15s;pointer-events:none}
+.node.big .lbl{opacity:1;font-size:14px}
+.node:hover .lbl{opacity:1}
+.node.dim{opacity:.16}
+.node.unlit .dot{fill:var(--panel)!important;opacity:.5}
+.node.unlit .lbl{opacity:0!important}
+.node.big.unlit .lbl{opacity:.3!important}
+/* 分支标题（大节点） */
+.branchhead{cursor:pointer}
+.branchhead .ring{transition:transform .2s}
+.branchhead:hover .ring{transform:scale(1.08)}
+.bh-name{font-size:19px;font-weight:normal}
+.bh-count{font-size:12px;fill:var(--dim)}
+
+/* 图例 + 分支切换 */
+.controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:18px}
+.chip{font-size:.8rem;padding:3px 14px;border:2px solid var(--line);background:var(--panel);cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;transition:all .15s}
+.chip .sw{width:11px;height:11px;border-radius:50%;display:inline-block}
+.chip[data-b=tech] .sw{background:var(--tech)} .chip[data-b=craft] .sw{background:var(--craft)}
+.chip[data-b=hu] .sw{background:var(--hu)} .chip[data-b=all] .sw{background:var(--ink)}
+.chip.on{box-shadow:2px 2px 0 var(--dark);border-color:var(--dark);transform:translateY(-1px)}
+.chip.on[data-b=tech]{border-color:var(--tech)} .chip.on[data-b=craft]{border-color:var(--craft)}
+.chip.on[data-b=hu]{border-color:var(--hu)}
+
+/* 进度滑块 */
+.progress{margin-top:26px;background:var(--panel);border:3px solid var(--line);box-shadow:4px 4px 0 var(--dark);padding:16px 20px}
+.progress .row{display:flex;justify-content:space-between;align-items:baseline;font-size:.78rem;color:var(--dim);margin-bottom:8px}
+.progress .row b{color:var(--hu);font-size:1rem}
+.progress input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:10px;background:var(--bg);
+  border:2px solid var(--dark);outline:none;cursor:pointer}
+.progress input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--hu);
+  border:2px solid var(--ink);cursor:grab}
+.progress input[type=range]::-moz-range-thumb{width:18px;height:18px;background:var(--hu);border:2px solid var(--ink);cursor:grab;border-radius:0}
+.progress .ticks{display:flex;justify-content:space-between;font-size:.66rem;color:var(--dim);margin-top:5px}
+.tipnow{text-align:center;font-size:.78rem;color:#6b6256;min-height:1.6em;margin-top:10px}
+.tipnow b{color:var(--ink)}
+
+/* 转职小卡（点缀） */
+.jobcard{margin-top:40px;max-width:480px}
+.jobcard .card{background:var(--panel);border:3px solid var(--line);box-shadow:4px 4px 0 var(--dark);padding:12px 14px}
+.jobcard .cap{font-size:.72rem;color:var(--dim);margin-bottom:8px}
+.jobcard img{width:100%;height:auto;image-rendering:pixelated;display:block;border:2px solid var(--line)}
+.jobcard .chain{font-size:.72rem;color:#6b6256;margin-top:8px;line-height:1.7}
+
+.takeaway{margin-top:48px;border-top:2px dashed var(--dark);padding-top:18px;font-size:.8rem;color:#6b6256}
+.takeaway b{color:var(--ink)}
+.takeaway li{margin:4px 0 4px 18px}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+@media(max-width:640px){
+  .wrap{padding:56px 14px}
+  .node .lbl{font-size:16px} .node.big .lbl{font-size:18px}
+  .bh-name{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="topbar">方案 <b>v2 · 重做</b> — 更轻、身份用 hashtag（过去时划掉）、技能只分三支、进度滑块按年代点亮 · 立绘已去掉</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="bg" id="heroBg"></div>
+  <div class="inner">
+    <h1>王彪</h1>
+    <p class="role">白手起家、经历<span class="hot">超杂</span>的游戏农民工</p>
+    <div class="tags" id="heroTags"></div>
+    <p class="lead">一个<span class="kw">第一代数据人</span>，绕过摄影、咨询、巴黎的游戏工作室，<br>最后决定亲手做游戏——因为<span class="kw">「玩」是人的天性</span>。</p>
+  </div>
+  <div class="scroll-hint">▼ 往下看我的技能星图</div>
+</section>
+
+<!-- ===== 技能星图 ===== -->
+<section class="wrap" id="skills">
+  <div class="h2">技能星图</div>
+  <p class="sub">// 换了十几次职业，技能一个没退 —— 三支主干，越点越亮</p>
+
+  <div class="starfield">
+    <svg id="tree" viewBox="0 0 1000 620" role="img" aria-label="技能星图"></svg>
+  </div>
+
+  <div class="controls" id="controls">
+    <span class="chip on" data-b="all"><span class="sw"></span>全部</span>
+    <span class="chip" data-b="tech"><span class="sw"></span>技术系</span>
+    <span class="chip" data-b="craft"><span class="sw"></span>创作系</span>
+    <span class="chip" data-b="hu"><span class="sw"></span>江湖系</span>
+  </div>
+
+  <div class="progress">
+    <div class="row"><span>人生进度 · 拖动看技能怎么一点点长出来</span><b id="yearLbl">NOW</b></div>
+    <input type="range" id="scrub" min="2007" max="2026" step="1" value="2026">
+    <div class="ticks"><span>2007</span><span>2014</span><span>2019</span><span>2023</span><span>NOW</span></div>
+    <div class="tipnow" id="tipnow">此刻：全部 <b>28</b> 项技能在线（含修炼中）</div>
+  </div>
+
+  <div class="jobcard">
+    <div class="cap">▸ 附：转职小史（点缀，非重点）</div>
+    <div class="card">
+      <img src="../img/job-chain.png" alt="转职进化链">
+      <p class="chain">读书人 → 摄影师 → 运营 → 数据法师 → 顾问 → 独立开发者 → 创业者 → 保险经理人</p>
+    </div>
+  </div>
+
+  <div class="takeaway">
+    <p><b>这一版的取舍：</b></p>
+    <ul>
+      <li>星图<b>只按三支</b>（技术/创作/江湖）分，不再和 7 个身份一一绑——身份只在开篇当 hashtag，过去时划掉。</li>
+      <li>技术系最粗（10 项），创作、江湖各 9 项，一眼看出主次。</li>
+      <li>去掉了立绘和独立角色面板；转职图缩成一张小卡片当点缀。</li>
+      <li>进度滑块是从你那张健身 skill tree 参考偷来的巧思：把"经历超杂"讲成一条随时间点亮的线。</li>
+    </ul>
+    <p style="margin-top:12px"><b>还需你定：</b>技能树在开篇是继续当「若隐若现的背景」（现在这样），还是干脆做成首屏就能玩的主交互？两种我都能给。</p>
+  </div>
+</section>
+
+<script>
+/* ---------- 数据 ---------- */
+// 身份 hashtag：past=过去的职业（划掉），now=当下
+var IDENT=[
+  {t:'#运营专员',s:'past'},{t:'#摄影师',s:'past'},{t:'#数据工程师',s:'past'},
+  {t:'#管理咨询顾问',s:'past'},{t:'#游戏开发者',s:'now'},{t:'#创业者',s:'now'},{t:'#保险经理人',s:'now'}
+];
+// 三支技能。year=大致习得年份（给进度滑块用）；big=分支里的招牌技能（默认显示标签）
+var BRANCH={
+  tech:{name:'技术系',color:'#7d9cc0',
+    skills:[
+      {n:'统计建模',y:2013},{n:'取数与实验设计',y:2014},{n:'数仓与 ETL',y:2015},
+      {n:'挖掘与推荐',y:2016,big:1},{n:'用研与 A/B',y:2017},{n:'数据产品化',y:2018,big:1},
+      {n:'概率系统设计',y:2019},{n:'Unity 全栈开发',y:2024,big:1},
+      {n:'AIGC 工具链',y:2026,tr:1},{n:'Agent 编排',y:2026,tr:1}
+    ]},
+  craft:{name:'创作系',color:'#d494a8',
+    skills:[
+      {n:'摄影与修图',y:2014,big:1},{n:'播客制作',y:2022,big:1},{n:'长文写作',y:2023},
+      {n:'游戏配乐与音效',y:2024,tr:1},{n:'素描基本功',y:2025},{n:'扒谱与打谱',y:2025},
+      {n:'数字绘画',y:2025,tr:1},{n:'声乐与视唱',y:2025,tr:1},{n:'编曲与混音',y:2026,tr:1}
+    ]},
+  hu:{name:'江湖系',color:'#e0913e',
+    skills:[
+      {n:'街头地推',y:2013},{n:'增长漏斗运营',y:2014,big:1},{n:'尽调与估值',y:2020},
+      {n:'商业计划与路演',y:2020},{n:'战略咨询',y:2021,big:1},{n:'BD 与大客沟通',y:2022},
+      {n:'商业情报',y:2026,tr:1},{n:'团队组建与带人',y:2026,tr:1},{n:'保险与风险规划',y:2026,tr:1}
+    ]}
+};
+// 三支主干的贝塞尔（base 在底部中间，向上扇开；技术居中最高）
+var TRUNK={
+  tech:{p:[[500,600],[500,470],[492,300],[500,90]]},
+  craft:{p:[[500,600],[430,500],[300,400],[150,210]]},
+  hu:{p:[[500,600],[570,500],[700,400],[850,210]]}
+};
+
+/* ---------- 工具 ---------- */
+var SVGNS='http://www.w3.org/2000/svg';
+function el(t,a,parent){var e=document.createElementNS(SVGNS,t);for(var k in a)e.setAttribute(k,a[k]);if(parent)parent.appendChild(e);return e;}
+function bez(p,t){var u=1-t,x=u*u*u*p[0][0]+3*u*u*t*p[1][0]+3*u*t*t*p[2][0]+t*t*t*p[3][0],
+  y=u*u*u*p[0][1]+3*u*u*t*p[1][1]+3*u*t*t*p[2][1]+t*t*t*p[3][1];return[x,y];}
+function pathD(p){return 'M'+p[0][0]+' '+p[0][1]+' C'+p[1][0]+' '+p[1][1]+' '+p[2][0]+' '+p[2][1]+' '+p[3][0]+' '+p[3][1];}
+
+/* ---------- 渲染 hero 背景（静态简版星图） ---------- */
+function drawBg(){
+  var s=el('svg',{viewBox:'0 0 1000 620'});
+  for(var k in TRUNK){var b=BRANCH[k],tr=TRUNK[k];
+    el('path',{d:pathD(tr.p),fill:'none',stroke:b.color,'stroke-width':7,'stroke-linecap':'round',opacity:.9},s);
+    var n=b.skills.length;
+    for(var i=0;i<n;i++){var pt=bez(tr.p,.2+.8*i/(n-1));el('circle',{cx:pt[0],cy:pt[1],r:6,fill:b.color},s);}
+  }
+  document.getElementById('heroBg').appendChild(s);
+}
+
+/* ---------- 渲染 hero tags ---------- */
+function drawTags(){
+  var box=document.getElementById('heroTags');
+  IDENT.forEach(function(d){var e=document.createElement('span');e.className='t '+d.s;e.textContent=d.t;box.appendChild(e);});
+}
+
+/* ---------- 渲染主星图 ---------- */
+var NODES=[]; // {g,dot,year,branch}
+function drawTree(){
+  var svg=document.getElementById('tree');
+  // 主干 + 节点
+  for(var k in TRUNK){
+    var b=BRANCH[k],tr=TRUNK[k];
+    var trunk=el('path',{d:pathD(tr.p),class:'trunk','data-b':k,stroke:b.color,
+      'stroke-width':k==='tech'?11:8,opacity:.85},svg);
+    b.trunkEl=trunk;
+    var n=b.skills.length;
+    b.skills.forEach(function(sk,i){
+      var t=.15+.72*i/(n-1), pt=bez(tr.p,t); // 顶端留白给分支头（crown）
+      // 小枝：从主干点垂直挑出去放标签（交替左右）
+      var g=el('g',{class:'node'+(sk.big?' big':''),'data-b':k},svg);
+      var r=sk.big?11:(sk.tr?6:7);
+      var dot=el('circle',{cx:pt[0],cy:pt[1],r:r,class:'dot',
+        fill:sk.tr?'#fffaf0':b.color, stroke:b.color,'stroke-width':sk.tr?2.5:0},g);
+      // 标签位置：左支往左、右支往右、中支交替
+      var side = k==='craft'?-1 : k==='hu'?1 : (i%2?1:-1);
+      var lx=pt[0]+side*(sk.big?20:14), anchor=side<0?'end':'start';
+      var lbl=el('text',{x:lx,y:pt[1]+4,class:'lbl','text-anchor':anchor,fill:b.color},g);
+      lbl.textContent=sk.n;
+      NODES.push({g:g,dot:dot,year:sk.y,branch:k,name:sk.n,tr:sk.tr});
+    });
+    // 分支头（顶端大圈 + 名字 + 计数）
+    var head=bez(tr.p,1.0);
+    var hg=el('g',{class:'branchhead','data-b':k},svg);
+    el('circle',{cx:head[0],cy:head[1],r:22,class:'ring',fill:'#fffaf0',stroke:b.color,'stroke-width':4},hg);
+    el('circle',{cx:head[0],cy:head[1],r:8,fill:b.color},hg);
+    var ny=head[1]-46;
+    el('text',{x:head[0],y:ny,class:'bh-name','text-anchor':'middle',fill:b.color},hg).textContent=b.name;
+    var cnt=el('text',{x:head[0],y:ny+16,class:'bh-count','text-anchor':'middle'},hg);
+    cnt.textContent='已点亮 '+b.skills.length; b.cntEl=cnt;
+    hg.addEventListener('click',function(){toggle(this.getAttribute('data-b'));});
+  }
+}
+
+/* ---------- 分支聚焦 ---------- */
+var focusB='all';
+function toggle(b){
+  focusB = (focusB===b)?'all':b;
+  document.querySelectorAll('.chip').forEach(function(c){c.classList.toggle('on',c.getAttribute('data-b')===focusB || (focusB==='all'&&c.getAttribute('data-b')==='all'));});
+  applyFocus();
+}
+function applyFocus(){
+  NODES.forEach(function(nd){
+    var off = focusB!=='all' && nd.branch!==focusB;
+    nd.g.classList.toggle('dim',off);
+  });
+  for(var k in BRANCH){
+    var on = focusB==='all'||focusB===k;
+    BRANCH[k].trunkEl.style.opacity = on?0.85:0.12;
+    BRANCH[k].trunkEl.style.strokeWidth = (focusB===k)?(k==='tech'?13:11):(k==='tech'?11:8);
+  }
+}
+document.getElementById('controls').addEventListener('click',function(e){
+  var c=e.target.closest('.chip'); if(!c)return; toggle(c.getAttribute('data-b'));
+});
+
+/* ---------- 进度滑块 ---------- */
+var scrub=document.getElementById('scrub'),yearLbl=document.getElementById('yearLbl'),tipnow=document.getElementById('tipnow');
+function applyYear(y){
+  yearLbl.textContent = y>=2026?'NOW':y;
+  var cnt={tech:0,craft:0,hu:0};
+  NODES.forEach(function(nd){
+    var lit = nd.year<=y;
+    nd.g.classList.toggle('unlit',!lit);
+    if(lit)cnt[nd.branch]++;
+  });
+  for(var k in BRANCH){ BRANCH[k].cntEl.textContent='已点亮 '+cnt[k]; }
+  var total=cnt.tech+cnt.craft+cnt.hu;
+  if(y>=2026) tipnow.innerHTML='此刻：全部 <b>28</b> 项技能在线（含修炼中）';
+  else tipnow.innerHTML='到 <b>'+y+'</b> 年：技术 '+cnt.tech+' · 创作 '+cnt.craft+' · 江湖 '+cnt.hu+'，共点亮 <b>'+total+'</b> 项';
+}
+scrub.addEventListener('input',function(){applyYear(+this.value);});
+
+/* ---------- init ---------- */
+drawBg(); drawTags(); drawTree(); applyYear(2026);
+</script>
+</body>
+</html>
