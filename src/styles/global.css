@@ -90,6 +90,11 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
   transition: all .15s steps(2);
 }
 .tags a:hover { color: #fff; background: var(--green); border-color: var(--green); transform: translateY(-2px); }
+/* 过去的身份：划掉（体验留下了，头衔翻篇了）；当下的身份：绿色实心 */
+.tags a.past { color: var(--ink-dim); text-decoration: line-through; text-decoration-color: var(--orange);
+  text-decoration-thickness: 2px; background: transparent; border-style: dashed; }
+.tags a.past:hover { color: #fff; background: var(--ink-dim); border-color: var(--ink-dim); text-decoration-color: #fff; }
+.tags a.now { color: var(--ink); border-color: var(--green); box-shadow: 2px 2px 0 var(--green); }
 .press-start {
   margin-top: 24px;
   font-size: 1rem;
@@ -188,10 +193,61 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
   transition: transform .12s steps(2);
 }
 .skpill:hover { transform: translateY(-2px); }
-.skpill.b-data  { color: var(--blue);   border-color: var(--blue);   background: rgba(125,156,192,.12); }
+.skpill.b-tech  { color: var(--blue);   border-color: var(--blue);   background: rgba(125,156,192,.12); }
 .skpill.b-craft { color: #b56b83;        border-color: var(--pink);   background: rgba(212,148,168,.14); }
 .skpill.b-biz   { color: #b9762c;        border-color: var(--orange); background: rgba(224,145,62,.14); }
-.skpill.training { background: transparent; border-style: dashed; }
+.skpill.learning { background: transparent; border-style: dashed; }
+
+/* ============ 三视图 tab + 全量技能树 ============ */
+.jtabs { display: flex; gap: 8px; margin: 10px 0 24px; }
+.jtab {
+  font-family: inherit; font-size: .84rem; cursor: pointer;
+  color: var(--ink-dim); background: var(--bg-panel);
+  border: var(--px) solid var(--line); box-shadow: 2px 2px 0 var(--line-dark);
+  padding: 5px 16px; transition: all .12s steps(2);
+}
+.jtab:hover { color: var(--ink); transform: translateY(-1px); }
+.jtab.on { color: #fff; background: var(--orange); border-color: var(--orange); box-shadow: 2px 2px 0 var(--line-dark); }
+
+/* 旅程视图：只看故事，藏起技能层 */
+#journeyPane.mode-story .ch-skills,
+#journeyPane.mode-story .xp-wrap { display: none; }
+
+.tree-legend2 { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-bottom: 22px; font-size: .76rem; }
+.tree-legend2 .lg { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-dim); }
+.tree-legend2 .lg::before { content: ''; width: 14px; height: 14px; border: 2px solid var(--line-dark); display: inline-block; }
+.tree-legend2 .lg.lit::before { background: var(--green); border-color: var(--green); }
+.tree-legend2 .lg.learning::before { background: transparent; border-style: dashed; border-color: var(--orange); }
+.tree-legend2 .lg.locked::before { background: repeating-linear-gradient(45deg, transparent 0 3px, var(--line) 3px 4px); }
+.tree-legend2 .lg-note { color: var(--ink-dim); font-size: .72rem; }
+
+.tree3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.tcol { border: var(--px) solid var(--line); background: var(--bg-panel); box-shadow: var(--px) var(--px) 0 var(--line-dark); padding: 16px 14px 20px; }
+.tcol-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 3px solid var(--line); padding-bottom: 8px; margin-bottom: 14px; }
+.tcol-name { font-size: 1.05rem; }
+.tcol-cnt { font-size: .78rem; color: var(--ink-dim); }
+.tcol-tech .tcol-name { color: var(--blue); } .tcol-tech .tcol-head { border-color: var(--blue); }
+.tcol-craft .tcol-name { color: #b56b83; } .tcol-craft .tcol-head { border-color: var(--pink); }
+.tcol-biz .tcol-name { color: #b9762c; } .tcol-biz .tcol-head { border-color: var(--orange); }
+.tsub { margin-bottom: 16px; padding-left: 10px; border-left: 3px dotted var(--line-dark); }
+.tsub-name { font-size: .74rem; color: var(--ink-dim); margin-bottom: 7px; letter-spacing: .05em; }
+.tsub-nodes { display: flex; flex-wrap: wrap; gap: 6px; }
+.tnode {
+  font-size: .74rem; line-height: 1.5; padding: 2px 9px;
+  border: 2px solid var(--line-dark); white-space: nowrap;
+  transition: transform .12s steps(2);
+}
+.tnode:hover { transform: translateY(-2px); }
+/* 已点亮：实心（随支系上色，通过父列变量继承）；修炼中：虚线；未点亮：灰空格 */
+.tcol-tech  .tnode.lit { color: #fff; background: var(--blue);   border-color: var(--blue); }
+.tcol-craft .tnode.lit { color: #fff; background: var(--pink);   border-color: var(--pink); }
+.tcol-biz   .tnode.lit { color: #fff; background: var(--orange); border-color: var(--orange); }
+.tcol-tech  .tnode.learning { color: var(--blue);   border-color: var(--blue);   border-style: dashed; }
+.tcol-craft .tnode.learning { color: #b56b83;        border-color: var(--pink);   border-style: dashed; }
+.tcol-biz   .tnode.learning { color: #b9762c;        border-color: var(--orange); border-style: dashed; }
+.tnode.locked { color: var(--ink-dim); border-color: var(--line); border-style: dashed; background: transparent; opacity: .7; }
+
+@media (max-width: 760px) { .tree3 { grid-template-columns: 1fr; } }
 
 /* 技能收集进度条下的三支细分 */
 .sk-breakdown { display: flex; gap: 16px; justify-content: center; margin-top: 8px; font-size: .74rem; color: var(--ink-dim); }

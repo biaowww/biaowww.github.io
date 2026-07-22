@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import journeyData from '../data/journey.json';
-import skillData from '../data/skills.json';
+import tree from '../data/skilltree.json';
 import footprint from '../data/footprint.json';
 import works from '../data/works.json';
 import links from '../data/links.json';
@@ -11,23 +11,35 @@ const base = import.meta.env.BASE_URL.endsWith('/')
   : import.meta.env.BASE_URL + '/';
 
 const { acts, chapters } = journeyData;
-const { branches } = skillData;
 
-// 把技能按「习得于哪一章」归位 —— 技能发展融进英雄旅程，不再单开 module
-const branchMeta: Record<string, { name: string }> = {
-  data: { name: '技术' }, craft: { name: '创作' }, biz: { name: '江湖' },
-};
+// 合体/旅程用：把天赋盘上「已点亮/修炼中且有出处」的技能按章节归位
 const skillsByChapter: Record<string, Array<{ name: string; branch: string; state: string }>> = {};
-const branchTotals: Record<string, number> = { data: 0, craft: 0, biz: 0 };
-for (const b of branches) {
-  for (const t of b.tiers) {
-    for (const sk of t.skills) {
-      (skillsByChapter[sk.from] ??= []).push({ name: sk.name, branch: b.key, state: sk.state });
-      branchTotals[b.key] += 1;
+const branchTotals: Record<string, number> = { tech: 0, craft: 0, biz: 0 };
+for (const b of tree.branches) {
+  for (const sub of b.subs) {
+    for (const sk of sub.skills) {
+      if (sk.from && sk.state !== 'locked') {
+        (skillsByChapter[sk.from] ??= []).push({ name: sk.n, branch: b.key, state: sk.state });
+        branchTotals[b.key] += 1;
+      }
     }
   }
 }
-const skillTotal = branchTotals.data + branchTotals.craft + branchTotals.biz;
+const skillTotal = branchTotals.tech + branchTotals.craft + branchTotals.biz;
+
+// 技能树 tab 用：每支的 已点亮/全部 计数 + 全局统计
+const branchLit: Record<string, number> = {};
+const branchAll: Record<string, number> = {};
+const treeStats = { lit: 0, learning: 0, locked: 0 } as Record<string, number>;
+for (const b of tree.branches) {
+  let lit = 0, all = 0;
+  for (const sub of b.subs) for (const sk of sub.skills) {
+    all += 1; if (sk.state !== 'locked') lit += 1;
+    treeStats[sk.state] += 1;
+  }
+  branchLit[b.key] = lit; branchAll[b.key] = all;
+}
+const treeAll = treeStats.lit + treeStats.learning + treeStats.locked;
 
 const chapterIcons: Record<string, string> = {
   chengdu: '🏔', wuhan: '🌲', arizona: '🌵', uber: '🚗', photographer: '📷',
@@ -36,23 +48,34 @@ const chapterIcons: Record<string, string> = {
 };
 // 开屏标签 → 对应章节锚点（前后呼应）
 const heroTags = [
-  { label: '#运营专员', anchor: 'ch-uber' },
-  { label: '#摄影师', anchor: 'ch-photographer' },
-  { label: '#数据工程师', anchor: 'ch-netease' },
-  { label: '#管理咨询顾问', anchor: 'ch-accenture' },
-  { label: '#游戏开发者', anchor: 'ch-metaarteek' },
-  { label: '#创业者', anchor: 'ch-offcircle' },
-  { label: '#保险经理人', anchor: 'ch-insurance' },
+  { label: '#运营专员', anchor: 'ch-uber', state: 'past' },
+  { label: '#摄影师', anchor: 'ch-photographer', state: 'past' },
+  { label: '#数据工程师', anchor: 'ch-netease', state: 'past' },
+  { label: '#管理咨询顾问', anchor: 'ch-accenture', state: 'past' },
+  { label: '#游戏开发者', anchor: 'ch-metaarteek', state: 'now' },
+  { label: '#创业者', anchor: 'ch-offcircle', state: 'now' },
+  { label: '#保险经理人', anchor: 'ch-insurance', state: 'now' },
 ];
-// 剧情曲线节点：x 均分，y 手工定（低 = 高光时刻）
-const curvePoints: Array<[string, number]> = [
-  ['chengdu', 16], ['wuhan', 46], ['arizona', 66], ['uber', 50], ['photographer', 56],
-  ['netease', 44], ['quantic', 36], ['insead', 60], ['accenture', 40],
-  ['metaarteek', 78], ['offcircle', 28], ['insurance', 38],
+// 剧情曲线：y 越小 = 情绪越高。含两处「章内低谷」标注点（红点、不可点）。← 待王彪补更多高/低点
+const curvePoints: Array<{ id?: string; y: number; label?: string }> = [
+  { id: 'chengdu', y: 12, label: '巅峰' },
+  { id: 'wuhan', y: 54 },
+  { id: 'arizona', y: 40 },
+  { id: 'uber', y: 24 },
+  { id: 'photographer', y: 34 },
+  { y: 92, label: '网易头两年·水土不服' },
+  { id: 'netease', y: 42 },
+  { id: 'quantic', y: 18 },
+  { id: 'insead', y: 14 },
+  { id: 'accenture', y: 44 },
+  { y: 94, label: '埃森哲末期·想跑' },
+  { id: 'metaarteek', y: 66 },
+  { id: 'offcircle', y: 20, label: 'NOW↗' },
+  { id: 'insurance', y: 40 },
 ];
-const W = 800, H = 110, PAD = 30;
+const W = 820, H = 132, PAD = 40;
 const step = (W - PAD * 2) / (curvePoints.length - 1);
-const pts = curvePoints.map(([id, y], i) => ({ id, x: PAD + i * step, y }));
+const pts = curvePoints.map((p, i) => ({ ...p, x: PAD + i * step }));
 const pathD = pts.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(' ');
 
 const mapRows = footprint.pixelMap;
@@ -84,7 +107,7 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
       <h1>BIAO WANG</h1>
       <p class="tagline">白手起家、经历<span class="hl">超杂</span>的<span class="hl">游戏农民工</span></p>
       <div class="tags">
-        {heroTags.map((t) => <a href={`#${t.anchor}`}>{t.label}</a>)}
+        {heroTags.map((t) => <a href={`#${t.anchor}`} class={t.state}>{t.label}</a>)}
       </div>
       <button class="press-start" onclick="document.getElementById('intro').scrollIntoView()">
         ▶ PRESS START
@@ -104,15 +127,23 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
       </div>
     </section>
 
-    <!-- 1 · 英雄旅程 -->
+    <!-- 1 · 英雄旅程 · 技能树 -->
     <section id="journey">
-      <h2 class="sec-title">英雄旅程</h2>
-      <p class="sec-sub">// 一路走来，技能只增不减 —— 每一站点亮的，都留在身上</p>
+      <h2 class="sec-title">英雄旅程 · 技能树</h2>
+      <p class="sec-sub">// 一路走来，技能只增不减 —— 三种看法，做完你挑</p>
+      <div class="jtabs" id="jtabs">
+        <button class="jtab on" data-tab="combo">合体版</button>
+        <button class="jtab" data-tab="story">旅程</button>
+        <button class="jtab" data-tab="tree">技能树</button>
+      </div>
+
+      <!-- 旅程 / 合体 面板 -->
+      <div id="journeyPane">
       <div class="xp-wrap">
         <div class="xp-label"><span>技能收集</span><span><b id="xp-num">0</b> / {skillTotal}</span></div>
         <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
         <div class="sk-breakdown">
-          <span class="d">技术 <b id="mData">0</b>/{branchTotals.data}</span>
+          <span class="d">技术 <b id="mTech">0</b>/{branchTotals.tech}</span>
           <span class="c">创作 <b id="mCraft">0</b>/{branchTotals.craft}</span>
           <span class="z">江湖 <b id="mBiz">0</b>/{branchTotals.biz}</span>
         </div>
@@ -123,15 +154,20 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
         <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="人生剧情曲线">
           <path d={pathD} fill="none" stroke="var(--orange)" stroke-width="4" stroke-linejoin="round" />
           {pts.map((p) => (
-            <a href={`#ch-${p.id}`}>
-              <circle cx={p.x} cy={p.y} r="7" fill="var(--bg-panel)" stroke="var(--ink)" stroke-width="3" />
-            </a>
+            p.id ? (
+              <a href={`#ch-${p.id}`}>
+                <circle cx={p.x} cy={p.y} r="6.5" fill="var(--bg-panel)" stroke="var(--ink)" stroke-width="3" />
+              </a>
+            ) : (
+              <circle cx={p.x} cy={p.y} r="4.5" fill="var(--red)" />
+            )
           ))}
-          <text x={pts[0].x - 12} y={pts[0].y - 14} font-size="12" fill="var(--ink-dim)">巅峰</text>
-          <text x={pts[9].x - 24} y={pts[9].y + 22} font-size="12" fill="var(--ink-dim)">至暗时刻?</text>
-          <text x={pts[10].x - 12} y={pts[10].y - 14} font-size="12" fill="var(--ink-dim)">NOW↗</text>
+          {pts.filter((p) => p.label).map((p) => (
+            <text x={p.x} y={p.y > 60 ? p.y + 15 : p.y - 12} font-size="10.5"
+              fill={p.y > 60 ? 'var(--red)' : 'var(--ink-dim)'} text-anchor="middle">{p.label}</text>
+          ))}
         </svg>
-        <p class="curve-note">* 剧情曲线：巅峰出现在开场第 5 分钟，编剧胆子很大。节点可点击跳转。</p>
+        <p class="curve-note">* 情绪曲线：巅峰在开场第 5 分钟（编剧胆子很大），红点是两处低谷。节点可点击跳转。</p>
       </div>
 
       {acts.map((act) => (
@@ -162,11 +198,43 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
                     ))}
                   </div>
                 ) : null}
+                {/* branch keys: tech/craft/biz */}
               </div>
             </div>
           ))}
         </>
       ))}
+      </div><!-- /journeyPane -->
+
+      <!-- 技能树 面板（全量天赋盘） -->
+      <div id="treePane" hidden>
+        <div class="tree-legend2">
+          <span class="lg lit">已点亮 {treeStats.lit}</span>
+          <span class="lg learning">修炼中 {treeStats.learning}</span>
+          <span class="lg locked">未点亮 {treeStats.locked}</span>
+          <span class="lg-note">未点亮 = 有选择地留白，标出边界，不追求覆盖全行业</span>
+        </div>
+        <div class="tree3">
+          {tree.branches.map((b) => (
+            <div class={`tcol tcol-${b.key}`}>
+              <div class="tcol-head">
+                <span class="tcol-name">{b.name}</span>
+                <span class="tcol-cnt">{branchLit[b.key]} / {branchAll[b.key]}</span>
+              </div>
+              {b.subs.map((sub) => (
+                <div class="tsub">
+                  <div class="tsub-name">{sub.name}</div>
+                  <div class="tsub-nodes">
+                    {sub.skills.map((sk) => (
+                      <span class={`tnode ${sk.state}`}>{sk.n}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
 
     <!-- 2 · 世界地图 -->
@@ -245,8 +313,8 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
       const chapterEls = [...document.querySelectorAll('[data-chapter]')];
       const xpFill = document.getElementById('xp-fill');
       const xpNum = document.getElementById('xp-num');
-      const mEl = { data: document.getElementById('mData'), craft: document.getElementById('mCraft'), biz: document.getElementById('mBiz') };
-      const acc = { data: 0, craft: 0, biz: 0 };
+      const mEl = { tech: document.getElementById('mTech'), craft: document.getElementById('mCraft'), biz: document.getElementById('mBiz') };
+      const acc = { tech: 0, craft: 0, biz: 0 };
       const total = chapterEls.reduce((n, c) => n + c.querySelectorAll('.skpill').length, 0);
       const lit = new Set();
       function checkChapters() {
@@ -263,10 +331,10 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
           }
         }
         if (changed) {
-          const got = acc.data + acc.craft + acc.biz;
+          const got = acc.tech + acc.craft + acc.biz;
           xpFill.style.width = Math.round((got / (total || 1)) * 100) + '%';
           xpNum.textContent = String(got);
-          mEl.data.textContent = String(acc.data);
+          mEl.tech.textContent = String(acc.tech);
           mEl.craft.textContent = String(acc.craft);
           mEl.biz.textContent = String(acc.biz);
         }
@@ -274,6 +342,22 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
       addEventListener('scroll', checkChapters, { passive: true });
       addEventListener('resize', checkChapters);
       checkChapters();
+
+      // 三视图切换：合体 / 旅程 / 技能树
+      const jtabs = [...document.querySelectorAll('.jtab')];
+      const journeyPane = document.getElementById('journeyPane');
+      const treePane = document.getElementById('treePane');
+      function setTab(t) {
+        jtabs.forEach((b) => b.classList.toggle('on', b.dataset.tab === t));
+        const showJourney = t !== 'tree';
+        journeyPane.hidden = !showJourney;
+        treePane.hidden = t !== 'tree';
+        journeyPane.classList.toggle('mode-story', t === 'story'); // 旅程视图：藏起技能药丸与收集条，只看故事
+        if (showJourney) checkChapters();
+      }
+      document.getElementById('jtabs').addEventListener('click', (e) => {
+        const b = e.target.closest('.jtab'); if (b) setTab(b.dataset.tab);
+      });
 
       // 地图悬停战报
       const tip = document.getElementById('map-tip');

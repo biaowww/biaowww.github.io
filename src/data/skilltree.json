@@ -1,0 +1,130 @@
+{
+  "_note": "全量天赋盘。state: lit=已点亮(掌握) / learning=修炼中 / locked=未点亮(留出边界)。from=习得于哪一章(用于合体版随旅程点亮)。未点亮节点有选择地放，体现取舍与边界，不追求覆盖全行业。",
+  "branches": [
+    {
+      "key": "tech", "name": "技术系", "color": "--blue",
+      "subs": [
+        {
+          "name": "数据科学", "skills": [
+            { "n": "统计建模", "state": "lit", "from": "arizona" },
+            { "n": "取数与实验设计", "state": "lit", "from": "uber" },
+            { "n": "数仓与 ETL", "state": "lit", "from": "netease" },
+            { "n": "挖掘与推荐", "state": "lit", "from": "netease" },
+            { "n": "用研与 A/B", "state": "lit", "from": "netease" },
+            { "n": "概率系统设计", "state": "lit", "from": "netease" },
+            { "n": "数据产品化", "state": "lit", "from": "netease" },
+            { "n": "因果推断", "state": "locked" }
+          ]
+        },
+        {
+          "name": "AI / AIGC", "skills": [
+            { "n": "Prompt 工程", "state": "lit", "from": "offcircle" },
+            { "n": "AIGC 出图工作流", "state": "learning", "from": "offcircle" },
+            { "n": "Agent 编排", "state": "learning", "from": "offcircle" },
+            { "n": "本地模型部署", "state": "learning", "from": "offcircle" },
+            { "n": "RAG / 微调", "state": "locked" }
+          ]
+        },
+        {
+          "name": "游戏开发", "skills": [
+            { "n": "玩法原型", "state": "lit", "from": "metaarteek" },
+            { "n": "Unity", "state": "lit", "from": "metaarteek" },
+            { "n": "H5 / 小游戏", "state": "lit", "from": "metaarteek" },
+            { "n": "关卡 / 数值", "state": "learning", "from": "offcircle" },
+            { "n": "引擎 / 图形学", "state": "locked" }
+          ]
+        },
+        {
+          "name": "前端 / Web", "skills": [
+            { "n": "HTML / CSS", "state": "lit", "from": "offcircle" },
+            { "n": "JavaScript", "state": "lit", "from": "offcircle" },
+            { "n": "Astro / 静态站", "state": "lit", "from": "offcircle" },
+            { "n": "交互动效", "state": "learning", "from": "offcircle" },
+            { "n": "React", "state": "locked" }
+          ]
+        },
+        {
+          "name": "后端 / 基建", "skills": [
+            { "n": "SQL", "state": "lit", "from": "netease" },
+            { "n": "Python", "state": "lit", "from": "uber" },
+            { "n": "服务器 / 部署", "state": "lit", "from": "offcircle" },
+            { "n": "自动化流水线", "state": "learning", "from": "offcircle" },
+            { "n": "容器 / K8s", "state": "locked" }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "craft", "name": "创作系", "color": "--pink",
+      "subs": [
+        {
+          "name": "视觉", "skills": [
+            { "n": "摄影与修图", "state": "lit", "from": "photographer" },
+            { "n": "素描基本功", "state": "lit", "from": "offcircle" },
+            { "n": "数字绘画", "state": "learning", "from": "offcircle" },
+            { "n": "Blender 3D", "state": "learning", "from": "offcircle" },
+            { "n": "像素 / UI", "state": "learning", "from": "offcircle" },
+            { "n": "概念 / 分镜", "state": "locked" }
+          ]
+        },
+        {
+          "name": "声音", "skills": [
+            { "n": "扒谱与打谱", "state": "lit", "from": "offcircle" },
+            { "n": "8-bit / 芯片乐", "state": "lit", "from": "offcircle" },
+            { "n": "编曲与混音", "state": "learning", "from": "offcircle" },
+            { "n": "声乐与视唱", "state": "learning", "from": "offcircle" },
+            { "n": "游戏配乐 / 音效", "state": "learning", "from": "metaarteek" },
+            { "n": "母带处理", "state": "locked" }
+          ]
+        },
+        {
+          "name": "文字", "skills": [
+            { "n": "长文写作", "state": "lit", "from": "metaarteek" },
+            { "n": "内容运营", "state": "lit", "from": "metaarteek" },
+            { "n": "播客制作", "state": "lit", "from": "metaarteek" },
+            { "n": "游戏叙事 / 剧本", "state": "learning", "from": "offcircle" },
+            { "n": "脱口秀 / 演讲", "state": "locked" }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "biz", "name": "江湖系", "color": "--orange",
+      "subs": [
+        {
+          "name": "商业咨询", "skills": [
+            { "n": "战略咨询", "state": "lit", "from": "accenture" },
+            { "n": "BD 与大客沟通", "state": "lit", "from": "accenture" },
+            { "n": "商业分析", "state": "lit", "from": "insead" },
+            { "n": "尽调与估值", "state": "lit", "from": "insead" },
+            { "n": "行业研究", "state": "lit", "from": "accenture" }
+          ]
+        },
+        {
+          "name": "增长运营", "skills": [
+            { "n": "街头地推", "state": "lit", "from": "uber" },
+            { "n": "增长漏斗", "state": "lit", "from": "uber" },
+            { "n": "用户运营", "state": "lit", "from": "netease" },
+            { "n": "买量 / 投放", "state": "locked" }
+          ]
+        },
+        {
+          "name": "创业经营", "skills": [
+            { "n": "商业计划与路演", "state": "lit", "from": "insead" },
+            { "n": "商业情报", "state": "learning", "from": "offcircle" },
+            { "n": "品牌营销", "state": "learning", "from": "offcircle" },
+            { "n": "团队组建与带人", "state": "learning", "from": "offcircle" },
+            { "n": "融资", "state": "locked" }
+          ]
+        },
+        {
+          "name": "金融理财", "skills": [
+            { "n": "保险与风险规划", "state": "learning", "from": "insurance" },
+            { "n": "资产配置", "state": "locked" },
+            { "n": "二级投资", "state": "locked" }
+          ]
+        }
+      ]
+    }
+  ]
+}
