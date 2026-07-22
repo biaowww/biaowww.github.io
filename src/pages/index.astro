@@ -11,7 +11,23 @@ const base = import.meta.env.BASE_URL.endsWith('/')
   : import.meta.env.BASE_URL + '/';
 
 const { acts, chapters } = journeyData;
-const { character, branches } = skillData;
+const { branches } = skillData;
+
+// 把技能按「习得于哪一章」归位 —— 技能发展融进英雄旅程，不再单开 module
+const branchMeta: Record<string, { name: string }> = {
+  data: { name: '技术' }, craft: { name: '创作' }, biz: { name: '江湖' },
+};
+const skillsByChapter: Record<string, Array<{ name: string; branch: string; state: string }>> = {};
+const branchTotals: Record<string, number> = { data: 0, craft: 0, biz: 0 };
+for (const b of branches) {
+  for (const t of b.tiers) {
+    for (const sk of t.skills) {
+      (skillsByChapter[sk.from] ??= []).push({ name: sk.name, branch: b.key, state: sk.state });
+      branchTotals[b.key] += 1;
+    }
+  }
+}
+const skillTotal = branchTotals.data + branchTotals.craft + branchTotals.biz;
 
 const chapterIcons: Record<string, string> = {
   chengdu: '🏔', wuhan: '🌲', arizona: '🌵', uber: '🚗', photographer: '📷',
@@ -91,10 +107,15 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
     <!-- 1 · 英雄旅程 -->
     <section id="journey">
       <h2 class="sec-title">英雄旅程</h2>
-      <p class="sec-sub">// 三幕剧结构 · 向下滚动点亮章节</p>
+      <p class="sec-sub">// 一路走来，技能只增不减 —— 每一站点亮的，都留在身上</p>
       <div class="xp-wrap">
-        <div class="xp-label"><span>LIFE XP</span><span id="xp-num">0%</span></div>
+        <div class="xp-label"><span>技能收集</span><span><b id="xp-num">0</b> / {skillTotal}</span></div>
         <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
+        <div class="sk-breakdown">
+          <span class="d">技术 <b id="mData">0</b>/{branchTotals.data}</span>
+          <span class="c">创作 <b id="mCraft">0</b>/{branchTotals.craft}</span>
+          <span class="z">江湖 <b id="mBiz">0</b>/{branchTotals.biz}</span>
+        </div>
       </div>
 
       <!-- 剧情曲线 -->
@@ -133,86 +154,19 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
                 {ch.lines.map((l, i) => (
                   <p class={ch.id === 'chengdu' && i === 0 ? 'peak' : ''}>{l}</p>
                 ))}
+                {skillsByChapter[ch.id]?.length ? (
+                  <div class="ch-skills">
+                    <span class="lab">▸ 点亮技能</span>
+                    {skillsByChapter[ch.id].map((sk) => (
+                      <span class={`skpill b-${sk.branch} ${sk.state}`} data-b={sk.branch}>{sk.name}</span>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             </div>
           ))}
         </>
       ))}
-    </section>
-
-    <!-- 1.5 · 角色面板 + 技能树 -->
-    <section id="skills">
-      <h2 class="sec-title">角色面板 · 技能树</h2>
-      <p class="sec-sub">// 转职不清空技能栏 —— 所以这里没有删除线</p>
-
-      <div class="char-panel">
-        <div>
-          <img
-            class="portrait px"
-            id="portrait"
-            src={`${base}img/portrait.png`}
-            data-alt={`${base}img/portrait-alt.png`}
-            data-main={`${base}img/portrait.png`}
-            alt="王彪的像素立绘"
-            width="464"
-            height="616"
-          />
-          <p class="portrait-hint">点一下换个皮肤</p>
-        </div>
-        <div class="char-meta">
-          <div class="cname">{character.name}</div>
-          <div class="cclass">{character.class}</div>
-          <p class="cdesc">{character.desc}</p>
-          {character.stats.map((s) => (
-            <div class="stat-row">
-              <span class="sname">{s.name}</span>
-              <span class="stat-track"><span class={`stat-fill ${s.tone}`} style={`width:${s.val}%`}></span></span>
-              <span class="sval">{s.val}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <figure class="job-chain">
-        <img class="px" src={`${base}img/job-chain.png`} alt="转职进化链" width="1560" height="330" />
-        <figcaption>转职进化链：读书人 → 摄影师 → 运营 → 数据法师 → 顾问 → 独立开发者 → 创业者 → 保险经理人</figcaption>
-      </figure>
-
-      <div class="tree-grid">
-        {branches.map((b) => (
-          <div class={`branch ${b.key}`}>
-            <h3>{b.name}</h3>
-            <span class="btag">{b.tag}</span>
-            {b.tiers.map((t) => (
-              <div class="tier">
-                <div class="tier-label">{t.label}</div>
-                {t.skills.map((sk) => (
-                  <div class={`skill ${sk.state}`} data-skill>
-                    <img
-                      class="ico"
-                      src={`${base}img/icons/i-${String(sk.icon[0] * 5 + sk.icon[1]).padStart(2, '0')}.png`}
-                      alt=""
-                      width="26"
-                      height="26"
-                      loading="lazy"
-                    />
-                    <span class="sk-name">{sk.name}</span>
-                    <span class="sk-state">{stateLabel[sk.state]}</span>
-                    <span class="sk-tip">
-                      <span class="from">◆ {sk.fromName}</span> — {sk.evidence}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-      <div class="tree-legend">
-        <span><b class="m">已点亮</b> 长在身上、拿得出证据</span>
-        <span><b class="t">修炼中</b> 当前正在补的课</span>
-        <span>悬停任意技能，看它是哪一章练出来的</span>
-      </div>
     </section>
 
     <!-- 2 · 世界地图 -->
@@ -287,57 +241,39 @@ const stateLabel: Record<string, string> = { mastered: '已点亮', training: '�
     </footer>
 
     <script>
-      // 章节点亮 + XP 进度条（滚动计算，点亮后不熄灭）
+      // 章节点亮 → 技能随旅程累积（只增不减，点亮后不熄灭）
       const chapterEls = [...document.querySelectorAll('[data-chapter]')];
       const xpFill = document.getElementById('xp-fill');
       const xpNum = document.getElementById('xp-num');
+      const mEl = { data: document.getElementById('mData'), craft: document.getElementById('mCraft'), biz: document.getElementById('mBiz') };
+      const acc = { data: 0, craft: 0, biz: 0 };
+      const total = chapterEls.reduce((n, c) => n + c.querySelectorAll('.skpill').length, 0);
       const lit = new Set();
       function checkChapters() {
         const vh = window.innerHeight;
+        let changed = false;
         for (const c of chapterEls) {
           if (lit.has(c)) continue;
           const r = c.getBoundingClientRect();
           if (r.top < vh * 0.72) {
             c.classList.add('lit');
             lit.add(c);
+            c.querySelectorAll('.skpill').forEach((p) => { acc[p.dataset.b] += 1; });
+            changed = true;
           }
         }
-        const pct = Math.round((lit.size / chapterEls.length) * 100);
-        xpFill.style.width = pct + '%';
-        xpNum.textContent = pct + '%';
-      }
-
-      // 技能逐条解锁（进入视口时依次弹出）
-      const skillEls = [...document.querySelectorAll('[data-skill]')];
-      const shown = new Set();
-      function checkSkills() {
-        const vh = window.innerHeight;
-        let delay = 0;
-        for (const s of skillEls) {
-          if (shown.has(s)) continue;
-          const r = s.getBoundingClientRect();
-          if (r.top < vh * 0.92 && r.bottom > 0) {
-            shown.add(s);
-            setTimeout(() => s.classList.add('shown'), delay);
-            delay += 45;
-          }
+        if (changed) {
+          const got = acc.data + acc.craft + acc.biz;
+          xpFill.style.width = Math.round((got / (total || 1)) * 100) + '%';
+          xpNum.textContent = String(got);
+          mEl.data.textContent = String(acc.data);
+          mEl.craft.textContent = String(acc.craft);
+          mEl.biz.textContent = String(acc.biz);
         }
       }
-
-      function onScroll() { checkChapters(); checkSkills(); }
-      addEventListener('scroll', onScroll, { passive: true });
-      addEventListener('resize', onScroll);
-      onScroll();
-
-      // 立绘换皮肤
-      const portrait = document.getElementById('portrait');
-      if (portrait) {
-        portrait.addEventListener('click', () => {
-          const main = portrait.dataset.main, alt = portrait.dataset.alt;
-          const altFile = alt.split('/').pop();
-          portrait.setAttribute('src', portrait.getAttribute('src').endsWith(altFile) ? main : alt);
-        });
-      }
+      addEventListener('scroll', checkChapters, { passive: true });
+      addEventListener('resize', checkChapters);
+      checkChapters();
 
       // 地图悬停战报
       const tip = document.getElementById('map-tip');

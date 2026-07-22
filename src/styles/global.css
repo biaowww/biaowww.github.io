@@ -179,7 +179,29 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 .chapter p { font-size: .9rem; color: #6b6256; margin-bottom: .4em; }
 .chapter .peak { color: var(--orange); }
 
-/* ============ 1.5 · 角色面板 + 技能树 ============ */
+/* 技能药丸：这一站点亮的技能，长在旅程上（颜色随支系；随章节点亮而上色） */
+.ch-skills { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; }
+.ch-skills .lab { font-size: .68rem; color: var(--ink-dim); margin-right: 2px; }
+.skpill {
+  font-size: .72rem; line-height: 1.6; padding: 1px 9px;
+  border: 2px solid var(--line-dark); white-space: nowrap;
+  transition: transform .12s steps(2);
+}
+.skpill:hover { transform: translateY(-2px); }
+.skpill.b-data  { color: var(--blue);   border-color: var(--blue);   background: rgba(125,156,192,.12); }
+.skpill.b-craft { color: #b56b83;        border-color: var(--pink);   background: rgba(212,148,168,.14); }
+.skpill.b-biz   { color: #b9762c;        border-color: var(--orange); background: rgba(224,145,62,.14); }
+.skpill.training { background: transparent; border-style: dashed; }
+
+/* 技能收集进度条下的三支细分 */
+.sk-breakdown { display: flex; gap: 16px; justify-content: center; margin-top: 8px; font-size: .74rem; color: var(--ink-dim); }
+.sk-breakdown b { font-style: normal; }
+.sk-breakdown .d b { color: var(--blue); }
+.sk-breakdown .c b { color: #b56b83; }
+.sk-breakdown .z b { color: #b9762c; }
+.xp-label b { color: var(--orange); font-size: 1rem; }
+
+/* ============ 1.5 · 角色面板 + 技能树（旧，已停用；保留以防回退） ============ */
 img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
 
 .char-panel {
