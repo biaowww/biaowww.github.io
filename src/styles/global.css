@@ -184,6 +184,43 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 .chapter p { font-size: .9rem; color: #6b6256; margin-bottom: .4em; }
 .chapter .peak { color: var(--orange); }
 
+/* 开屏身份标签 · 两行：过去（划掉）/ 当下 */
+.tags-past { margin-top: 20px; }
+.tags-now { margin-top: 10px; }
+.tags-past a.past {
+  color: var(--ink-dim); text-decoration: line-through;
+  text-decoration-color: var(--orange); text-decoration-thickness: 2px;
+  background: transparent; border: 2px dashed var(--line-dark);
+}
+.tags-now a.now {
+  color: var(--ink); border: 2px solid var(--green);
+  box-shadow: 2px 2px 0 var(--green); background: var(--bg-panel);
+}
+
+/* ============ 技能星盘 ============ */
+.starmap { position: relative; margin-top: 20px;
+  background: radial-gradient(60% 55% at 50% 50%, #fffdf7 0%, #fdf6e6 60%, #f4ecd9 100%);
+  border: var(--px) solid var(--line); box-shadow: var(--px) var(--px) 0 var(--line-dark); }
+.starmap svg { display: block; width: 100%; height: auto; }
+.snode { cursor: help; transition: r .12s, opacity .2s; }
+.snode.lit:hover, .snode.learning:hover, .snode.locked:hover { opacity: 1; }
+.snode.lit:hover { r: 9; }
+.snode.locked:hover { opacity: 1; }
+.star-tip {
+  position: absolute; z-index: 30; pointer-events: none;
+  background: var(--ink); color: #f7f1e5; font-size: .74rem; line-height: 1.6;
+  padding: 7px 10px; max-width: 220px;
+  border-left: 4px solid var(--c, var(--orange)); box-shadow: 3px 3px 0 rgba(0,0,0,.15);
+}
+.star-tip b { color: #fff; }
+.tree-legend2 { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-top: 6px; font-size: .78rem; color: var(--ink-dim); }
+.tree-legend2 .lg { display: inline-flex; align-items: center; gap: 6px; }
+.tree-legend2 .lg::before { content: ''; width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+.tree-legend2 .lg.lit::before { background: var(--blue); }
+.tree-legend2 .lg.learning::before { background: var(--bg-panel); border: 2px dashed var(--pink); }
+.tree-legend2 .lg.locked::before { background: var(--bg-panel); border: 1.5px solid var(--line-dark); }
+.tree-legend2 .lg-note { color: var(--ink-dim); opacity: .8; }
+
 /* 技能药丸：这一站点亮的技能，长在旅程上（颜色随支系；随章节点亮而上色） */
 .ch-skills { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; }
 .ch-skills .lab { font-size: .68rem; color: var(--ink-dim); margin-right: 2px; }
