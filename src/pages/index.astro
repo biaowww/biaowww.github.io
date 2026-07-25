@@ -54,6 +54,7 @@ for (const b of tree.branches) {
     subLabels.push({ x: rnd(CX + lr * dx), y: rnd(CY + lr * dy), name: sub.name, color: b.color, anchor: dx > 0.25 ? 'start' : dx < -0.25 ? 'end' : 'middle' });
   });
 }
+const rings = [0, 2, 4, 6, 8].map((k) => R0 + k * DR); // 同心引导环，给星盘结构感
 const branchAnchor = tree.branches.map((b: any) => {
   const [a0, a1] = SECT[b.key];
   const rad = ((a0 + a1) / 2 * Math.PI) / 180;
@@ -223,13 +224,21 @@ const swVar: Record<string, string> = { R: '--green', E: '--blue', N: '--orange'
         <span class="lg-note">越靠外越进阶，前沿大多没点 —— 有选择地留白，不追求满级</span>
       </div>
 
+      <!-- 宽屏：径向星盘 -->
       <div class="starmap">
         <svg viewBox="0 0 920 804" role="img" aria-label="技能星盘">
+          {rings.map((r) => (
+            <circle cx={CX} cy={CY} r={r} fill="none" stroke="var(--line-dark)"
+              stroke-width="1" opacity="0.22" stroke-dasharray="2 5" />
+          ))}
           {spokes.map((s) => (
             <line x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke={`var(${s.color})`}
-              stroke-width="2" stroke-linecap="round" opacity={0.14 + 0.34 * s.litFrac} />
+              stroke-width="2.5" stroke-linecap="round" opacity={0.12 + 0.32 * s.litFrac} />
           ))}
-          <circle cx={CX} cy={CY} r="30" fill="var(--bg-panel)" stroke="var(--line-dark)" stroke-width="3" />
+          {treeNodes.filter((n) => n.state !== 'locked').map((nd) => (
+            <circle cx={nd.x} cy={nd.y} r="12" fill={`var(${nd.color})`} opacity="0.12" />
+          ))}
+          <circle cx={CX} cy={CY} r="31" fill="var(--bg-panel)" stroke="var(--line-dark)" stroke-width="3" />
           <text x={CX} y={CY - 2} text-anchor="middle" font-size="15" fill="var(--ink)">天赋</text>
           <text x={CX} y={CY + 15} text-anchor="middle" font-size="12" fill="var(--ink-dim)">{treeStats.lit}/{treeAll}</text>
           {treeNodes.map((nd) => (
@@ -251,6 +260,25 @@ const swVar: Record<string, string> = { R: '--green', E: '--blue', N: '--orange'
           ))}
         </svg>
         <div class="star-tip" id="starTip" hidden></div>
+      </div>
+
+      <!-- 窄屏：同一份数据，竖排可读版 -->
+      <div class="skill-list">
+        {tree.branches.map((b) => (
+          <div class={`sl-branch sl-${b.key}`}>
+            <div class="sl-head"><span class="sl-name">{b.name}</span><span class="sl-cnt">已点亮 {branchLit[b.key]} / {branchAll[b.key]}</span></div>
+            {b.subs.map((sub) => (
+              <div class="sl-sub">
+                <span class="sl-subname">{sub.name}</span>
+                <span class="sl-chips">
+                  {sub.skills.map((sk) => (
+                    <span class={`sl-chip ${sk.state}`}>{sk.n}</span>
+                  ))}
+                </span>
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     </section>
 

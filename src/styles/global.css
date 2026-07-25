@@ -198,6 +198,7 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 }
 
 /* ============ 技能星盘 ============ */
+.skill-list { display: none; } /* 默认宽屏用径向星盘；窄屏切竖排 */
 .starmap { position: relative; margin-top: 20px;
   background: radial-gradient(60% 55% at 50% 50%, #fffdf7 0%, #fdf6e6 60%, #f4ecd9 100%);
   border: var(--px) solid var(--line); box-shadow: var(--px) var(--px) 0 var(--line-dark); }
@@ -220,6 +221,21 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 .tree-legend2 .lg.learning::before { background: var(--bg-panel); border: 2px dashed var(--pink); }
 .tree-legend2 .lg.locked::before { background: var(--bg-panel); border: 1.5px solid var(--line-dark); }
 .tree-legend2 .lg-note { color: var(--ink-dim); opacity: .8; }
+
+/* 窄屏竖排技能表：三系 → 各子支 → 技能 chip（可读、可点） */
+.sl-branch { margin-top: 18px; border: var(--px) solid var(--line); box-shadow: var(--px) var(--px) 0 var(--line-dark); background: var(--bg-panel); padding: 12px 13px 14px; }
+.sl-branch { --bc: var(--ink); }
+.sl-tech { --bc: var(--blue); } .sl-craft { --bc: var(--pink); } .sl-biz { --bc: var(--orange); }
+.sl-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--line); padding-bottom: 7px; margin-bottom: 10px; }
+.sl-head .sl-name { font-size: 1.05rem; color: var(--bc); }
+.sl-head .sl-cnt { font-size: .72rem; color: var(--ink-dim); }
+.sl-sub { display: grid; grid-template-columns: 62px 1fr; gap: 8px; margin: 9px 0; align-items: start; }
+.sl-subname { font-size: .74rem; color: var(--ink-dim); padding-top: 3px; }
+.sl-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.sl-chip { font-size: .74rem; line-height: 1.5; padding: 1px 8px; border: 1.5px solid var(--bc); border-radius: 2px; }
+.sl-chip.lit { background: var(--bc); color: #fff; border-color: var(--bc); }
+.sl-chip.learning { color: var(--bc); background: transparent; border-style: dashed; }
+.sl-chip.locked { color: var(--ink-dim); border-color: var(--line-dark); opacity: .55; }
 
 /* 技能药丸：这一站点亮的技能，长在旅程上（颜色随支系；随章节点亮而上色） */
 .ch-skills { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; }
@@ -444,15 +460,22 @@ img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
 footer { text-align: center; color: var(--ink-dim); font-size: .72rem; padding: 60px 20px 80px; }
 footer .c { color: var(--orange); }
 
-@media (max-width: 760px) {
+/* 窄屏：径向星盘 → 竖排技能表（星盘在手机上会糊成 6px 字） */
+@media (max-width: 720px) {
+  .starmap { display: none; }
+  .skill-list { display: block; }
   .tree-grid { grid-template-columns: 1fr; }
   .char-panel { grid-template-columns: 130px 1fr; gap: 16px; }
 }
 @media (max-width: 560px) {
-  section { padding: 64px 16px; }
-  #map .cell { width: 9px; height: 9px; }
-  .chapter { grid-template-columns: 44px 1fr; gap: 12px; }
-  .chapter.is-side { margin-left: 14px; }
+  section { padding: clamp(48px, 12vw, 64px) 16px; }
+  #map { overflow-x: auto; }
+  .map-grid { min-width: max-content; }
+  #map .cell { width: 11px; height: 11px; }
+  .chapter { grid-template-columns: 40px 1fr; gap: 11px; }
+  .chapter.is-side { margin-left: 12px; }
   .char-panel { grid-template-columns: 1fr; }
   .char-panel .portrait { max-width: 200px; margin: 0 auto; }
+  .sl-sub { grid-template-columns: 1fr; gap: 3px; }
+  .sl-subname { padding-top: 0; }
 }
