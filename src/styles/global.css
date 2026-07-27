@@ -3,16 +3,29 @@
   --bg: #f7f1e5;          /* 米纸 */
   --bg-panel: #fffaf0;    /* 暖白 */
   --ink: #46403a;         /* 暖墨 */
-  --ink-dim: #a2937f;     /* 浅棕灰 */
+  --ink-dim: #7a6a55;     /* 次要文字：加深到米纸底上 ≥4.5:1，仍是暖棕不发灰 */
   --line: #e4d7c0;        /* 面板描边 */
   --line-dark: #d3c3a6;
+  /* 亮色层 = 面 / 描边 / 图形（对比不足，不作小字文字色） */
   --orange: #e0913e;      /* 主强调：暖橘 */
   --green: #7fa470;       /* 柔绿 */
   --blue: #7d9cc0;        /* 雾蓝 */
   --red: #c9705f;         /* 陶红 */
   --pink: #d494a8;        /* 藕粉 */
   --teal: #6fae9c;        /* 湖绿 */
+  /* 文字层 = 同色相加深版，米纸底上 ≥4.5:1；彩色文字一律走这层 */
+  --orange-text: #9b5c1a;
+  --green-text: #537545;
+  --blue-text: #4e6f94;
+  --pink-text: #9d566d;
+  --red-text: #ac4e3e;
   --px: 4px;
+  /* 动效 token：像素跳变用 steps()（签名不动），平滑位移统一指数缓出 */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-tap: .12s;    /* 即时反馈 */
+  --dur-state: .24s;  /* 常规状态切换 */
+  --dur-scene: .48s;  /* 章节入场 */
+  --dur-focal: .7s;   /* 唯一主创作瞬间：情绪曲线自绘 */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,11 +55,11 @@ section { max-width: 860px; margin: 0 auto; padding: 96px 24px; }
 
 h2.sec-title {
   font-size: 1.4rem;
-  color: var(--orange);
+  color: var(--orange-text);
   margin-bottom: 8px;
   letter-spacing: .1em;
 }
-h2.sec-title::before { content: '▚ '; color: var(--green); }
+h2.sec-title::before { content: '▚ '; color: var(--green-text); }
 .sec-sub { color: var(--ink-dim); font-size: .85rem; margin-bottom: 40px; }
 
 .panel {
@@ -59,7 +72,7 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 .draft-chip {
   display: inline-block;
   font-size: .68rem; color: #fff;
-  background: var(--pink);
+  background: var(--pink-text);
   padding: 1px 8px; margin-bottom: 12px;
   letter-spacing: .1em;
 }
@@ -79,7 +92,7 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
   letter-spacing: .12em;
 }
 #title-screen .tagline { color: var(--ink); font-size: 1.02rem; }
-#title-screen .tagline .hl { color: var(--orange); }
+#title-screen .tagline .hl { color: var(--orange-text); }
 .tags { display: flex; flex-wrap: wrap; gap: 8px 12px; justify-content: center; max-width: 640px; }
 .tags a {
   font-size: .78rem; text-decoration: none;
@@ -87,9 +100,9 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
   border: 2px solid var(--line);
   background: var(--bg-panel);
   padding: 2px 10px;
-  transition: all .15s steps(2);
+  transition: color var(--dur-tap) steps(2), background-color var(--dur-tap) steps(2), border-color var(--dur-tap) steps(2), transform var(--dur-tap) steps(2);
 }
-.tags a:hover { color: #fff; background: var(--green); border-color: var(--green); transform: translateY(-2px); }
+.tags a:hover { color: #fff; background: var(--green); border-color: var(--green); }
 /* 过去的身份：划掉（体验留下了，头衔翻篇了）；当下的身份：绿色实心 */
 .tags a.past { color: var(--ink-dim); text-decoration: line-through; text-decoration-color: var(--orange);
   text-decoration-thickness: 2px; background: transparent; border-style: dashed; }
@@ -98,7 +111,7 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 .press-start {
   margin-top: 24px;
   font-size: 1rem;
-  color: var(--orange);
+  color: var(--orange-text);
   background: none; border: none; cursor: pointer;
   font-family: inherit;
   animation: blink 1.2s steps(2) infinite;
@@ -108,22 +121,9 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 
 /* ============ intro ============ */
 #intro p { margin-bottom: 1.2em; }
-#intro .kw { color: var(--orange); }
+#intro .kw { color: var(--orange-text); }
 
 /* ============ 1 · 英雄旅程 ============ */
-#journey .xp-wrap {
-  position: sticky; top: 0; z-index: 10;
-  background: var(--bg);
-  padding: 12px 0 8px;
-}
-#journey .xp-label { font-size: .7rem; color: var(--ink-dim); display: flex; justify-content: space-between; }
-#journey .xp-bar { height: 14px; border: 3px solid var(--line-dark); background: var(--bg-panel); padding: 2px; }
-#journey .xp-fill {
-  height: 100%; width: 0%;
-  background: repeating-linear-gradient(90deg, var(--green) 0 8px, #93b784 8px 16px);
-  transition: width .3s steps(12);
-}
-
 /* 剧情曲线 */
 .curve-wrap { margin: 36px 0 8px; }
 .curve-wrap svg { width: 100%; height: auto; display: block; }
@@ -133,7 +133,7 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 .act-banner {
   margin: 64px 0 8px;
   background: var(--orange);
-  color: #fff;
+  color: #332a1e;
   display: inline-block;
   padding: 4px 16px;
   font-size: .9rem;
@@ -145,10 +145,10 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 .chapter {
   display: grid; grid-template-columns: 56px 1fr; gap: 20px;
   margin: 48px 0;
-  opacity: .3; filter: grayscale(1);
-  transition: opacity .5s, filter .5s;
+  opacity: .3; filter: grayscale(1); transform: translateY(14px);
+  transition: opacity var(--dur-scene) var(--ease-out), filter var(--dur-scene) var(--ease-out), transform var(--dur-scene) var(--ease-out);
 }
-.chapter.lit { opacity: 1; filter: none; }
+.chapter.lit { opacity: 1; filter: none; transform: none; }
 .chapter .node {
   width: 40px; height: 40px;
   border: var(--px) solid var(--line-dark);
@@ -158,8 +158,8 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 }
 .chapter.lit .node { border-color: var(--green); box-shadow: 2px 2px 0 var(--green); }
 .chapter .rail { width: 4px; background: var(--line); margin: 6px auto 0; min-height: 40px; }
-.chapter-head .tag { font-size: .7rem; color: var(--orange); letter-spacing: .15em; }
-.chapter-head .tag.side { color: var(--blue); }
+.chapter-head .tag { font-size: .7rem; color: var(--orange-text); letter-spacing: .15em; }
+.chapter-head .tag.side { color: var(--blue-text); }
 
 /* 支线：虚线轨道 + 缩进 + 侧栏标记，与主线明显区分 */
 .chapter.is-side { margin-left: 30px; }
@@ -176,13 +176,13 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 .side-badge {
   display: inline-block; margin-left: 8px;
   font-size: .6rem; letter-spacing: .12em;
-  color: #fff; background: var(--blue);
+  color: #fff; background: var(--blue-text);
   padding: 0 6px; vertical-align: middle;
 }
 .chapter-head h3 { font-size: 1.15rem; color: var(--ink); margin: 2px 0; }
 .chapter-head .meta { font-size: .78rem; color: var(--ink-dim); margin-bottom: 10px; }
 .chapter p { font-size: .9rem; color: #6b6256; margin-bottom: .4em; }
-.chapter .peak { color: var(--orange); }
+.chapter .peak { color: var(--orange-text); }
 
 /* 开屏身份标签 · 两行：过去（划掉）/ 当下 */
 .tags-past { margin-top: 20px; }
@@ -208,10 +208,11 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 .snode.lit:hover { r: 9; }
 .snode.locked:hover { opacity: 1; }
 .star-tip {
-  position: absolute; z-index: 30; pointer-events: none;
+  position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; will-change: transform;
   background: var(--ink); color: #f7f1e5; font-size: .74rem; line-height: 1.6;
   padding: 7px 10px; max-width: 220px;
-  border-left: 4px solid var(--c, var(--orange)); box-shadow: 3px 3px 0 rgba(0,0,0,.15);
+  border: 2px solid var(--c, var(--orange)); box-shadow: 3px 3px 0 rgba(0,0,0,.15);
+  animation: tip-in var(--dur-tap) var(--ease-out);
 }
 .star-tip b { color: #fff; }
 .tree-legend2 { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-top: 6px; font-size: .78rem; color: var(--ink-dim); }
@@ -224,183 +225,18 @@ h2.sec-title::before { content: '▚ '; color: var(--green); }
 
 /* 窄屏竖排技能表：三系 → 各子支 → 技能 chip（可读、可点） */
 .sl-branch { margin-top: 18px; border: var(--px) solid var(--line); box-shadow: var(--px) var(--px) 0 var(--line-dark); background: var(--bg-panel); padding: 12px 13px 14px; }
-.sl-branch { --bc: var(--ink); }
-.sl-tech { --bc: var(--blue); } .sl-craft { --bc: var(--pink); } .sl-biz { --bc: var(--orange); }
+.sl-branch { --bc: var(--ink); --bct: var(--ink); }
+.sl-tech { --bc: var(--blue); --bct: var(--blue-text); } .sl-craft { --bc: var(--pink); --bct: var(--pink-text); } .sl-biz { --bc: var(--orange); --bct: var(--orange-text); }
 .sl-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--line); padding-bottom: 7px; margin-bottom: 10px; }
-.sl-head .sl-name { font-size: 1.05rem; color: var(--bc); }
+.sl-head .sl-name { font-size: 1.05rem; color: var(--bct); }
 .sl-head .sl-cnt { font-size: .72rem; color: var(--ink-dim); }
 .sl-sub { display: grid; grid-template-columns: 62px 1fr; gap: 8px; margin: 9px 0; align-items: start; }
 .sl-subname { font-size: .74rem; color: var(--ink-dim); padding-top: 3px; }
 .sl-chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .sl-chip { font-size: .74rem; line-height: 1.5; padding: 1px 8px; border: 1.5px solid var(--bc); border-radius: 2px; }
-.sl-chip.lit { background: var(--bc); color: #fff; border-color: var(--bc); }
-.sl-chip.learning { color: var(--bc); background: transparent; border-style: dashed; }
+.sl-chip.lit { background: var(--bct); color: #fff; border-color: var(--bct); }
+.sl-chip.learning { color: var(--bct); background: transparent; border-style: dashed; }
 .sl-chip.locked { color: var(--ink-dim); border-color: var(--line-dark); opacity: .55; }
-
-/* 技能药丸：这一站点亮的技能，长在旅程上（颜色随支系；随章节点亮而上色） */
-.ch-skills { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; }
-.ch-skills .lab { font-size: .68rem; color: var(--ink-dim); margin-right: 2px; }
-.skpill {
-  font-size: .72rem; line-height: 1.6; padding: 1px 9px;
-  border: 2px solid var(--line-dark); white-space: nowrap;
-  transition: transform .12s steps(2);
-}
-.skpill:hover { transform: translateY(-2px); }
-.skpill.b-tech  { color: var(--blue);   border-color: var(--blue);   background: rgba(125,156,192,.12); }
-.skpill.b-craft { color: #b56b83;        border-color: var(--pink);   background: rgba(212,148,168,.14); }
-.skpill.b-biz   { color: #b9762c;        border-color: var(--orange); background: rgba(224,145,62,.14); }
-.skpill.learning { background: transparent; border-style: dashed; }
-
-/* ============ 三视图 tab + 全量技能树 ============ */
-.jtabs { display: flex; gap: 8px; margin: 10px 0 24px; }
-.jtab {
-  font-family: inherit; font-size: .84rem; cursor: pointer;
-  color: var(--ink-dim); background: var(--bg-panel);
-  border: var(--px) solid var(--line); box-shadow: 2px 2px 0 var(--line-dark);
-  padding: 5px 16px; transition: all .12s steps(2);
-}
-.jtab:hover { color: var(--ink); transform: translateY(-1px); }
-.jtab.on { color: #fff; background: var(--orange); border-color: var(--orange); box-shadow: 2px 2px 0 var(--line-dark); }
-
-/* 旅程视图：只看故事，藏起技能层 */
-#journeyPane.mode-story .ch-skills,
-#journeyPane.mode-story .xp-wrap { display: none; }
-
-.tree-legend2 { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-bottom: 22px; font-size: .76rem; }
-.tree-legend2 .lg { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-dim); }
-.tree-legend2 .lg::before { content: ''; width: 14px; height: 14px; border: 2px solid var(--line-dark); display: inline-block; }
-.tree-legend2 .lg.lit::before { background: var(--green); border-color: var(--green); }
-.tree-legend2 .lg.learning::before { background: transparent; border-style: dashed; border-color: var(--orange); }
-.tree-legend2 .lg.locked::before { background: repeating-linear-gradient(45deg, transparent 0 3px, var(--line) 3px 4px); }
-.tree-legend2 .lg-note { color: var(--ink-dim); font-size: .72rem; }
-
-.tree3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.tcol { border: var(--px) solid var(--line); background: var(--bg-panel); box-shadow: var(--px) var(--px) 0 var(--line-dark); padding: 16px 14px 20px; }
-.tcol-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 3px solid var(--line); padding-bottom: 8px; margin-bottom: 14px; }
-.tcol-name { font-size: 1.05rem; }
-.tcol-cnt { font-size: .78rem; color: var(--ink-dim); }
-.tcol-tech .tcol-name { color: var(--blue); } .tcol-tech .tcol-head { border-color: var(--blue); }
-.tcol-craft .tcol-name { color: #b56b83; } .tcol-craft .tcol-head { border-color: var(--pink); }
-.tcol-biz .tcol-name { color: #b9762c; } .tcol-biz .tcol-head { border-color: var(--orange); }
-.tsub { margin-bottom: 16px; padding-left: 10px; border-left: 3px dotted var(--line-dark); }
-.tsub-name { font-size: .74rem; color: var(--ink-dim); margin-bottom: 7px; letter-spacing: .05em; }
-.tsub-nodes { display: flex; flex-wrap: wrap; gap: 6px; }
-.tnode {
-  font-size: .74rem; line-height: 1.5; padding: 2px 9px;
-  border: 2px solid var(--line-dark); white-space: nowrap;
-  transition: transform .12s steps(2);
-}
-.tnode:hover { transform: translateY(-2px); }
-/* 已点亮：实心（随支系上色，通过父列变量继承）；修炼中：虚线；未点亮：灰空格 */
-.tcol-tech  .tnode.lit { color: #fff; background: var(--blue);   border-color: var(--blue); }
-.tcol-craft .tnode.lit { color: #fff; background: var(--pink);   border-color: var(--pink); }
-.tcol-biz   .tnode.lit { color: #fff; background: var(--orange); border-color: var(--orange); }
-.tcol-tech  .tnode.learning { color: var(--blue);   border-color: var(--blue);   border-style: dashed; }
-.tcol-craft .tnode.learning { color: #b56b83;        border-color: var(--pink);   border-style: dashed; }
-.tcol-biz   .tnode.learning { color: #b9762c;        border-color: var(--orange); border-style: dashed; }
-.tnode.locked { color: var(--ink-dim); border-color: var(--line); border-style: dashed; background: transparent; opacity: .7; }
-
-@media (max-width: 760px) { .tree3 { grid-template-columns: 1fr; } }
-
-/* 技能收集进度条下的三支细分 */
-.sk-breakdown { display: flex; gap: 16px; justify-content: center; margin-top: 8px; font-size: .74rem; color: var(--ink-dim); }
-.sk-breakdown b { font-style: normal; }
-.sk-breakdown .d b { color: var(--blue); }
-.sk-breakdown .c b { color: #b56b83; }
-.sk-breakdown .z b { color: #b9762c; }
-.xp-label b { color: var(--orange); font-size: 1rem; }
-
-/* ============ 1.5 · 角色面板 + 技能树（旧，已停用；保留以防回退） ============ */
-img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
-
-.char-panel {
-  display: grid; grid-template-columns: 190px 1fr; gap: 26px;
-  align-items: start;
-  background: var(--bg-panel);
-  border: var(--px) solid var(--line);
-  box-shadow: var(--px) var(--px) 0 var(--line-dark);
-  padding: 22px;
-}
-.char-panel .portrait {
-  width: 100%; height: auto; display: block;
-  border: 3px solid var(--line-dark);
-  background: #f6ecd3;
-  cursor: pointer;
-  animation: idle-bob 1.6s steps(1) infinite;
-}
-/* 站立待机：两帧上下微动，像素游戏的 idle 动画 */
-@keyframes idle-bob { 0%, 50% { transform: translateY(0); } 51%, 100% { transform: translateY(2px); } }
-@media (prefers-reduced-motion: reduce) { .char-panel .portrait { animation: none; } }
-.portrait-hint { font-size: .62rem; color: var(--ink-dim); text-align: center; margin-top: 6px; }
-.char-meta .cname { font-size: 1.2rem; letter-spacing: .06em; }
-.char-meta .cclass { font-size: .8rem; color: var(--orange); margin-bottom: 4px; }
-.char-meta .cdesc { font-size: .8rem; color: #6b6256; margin-bottom: 14px; }
-.stat-row { display: flex; align-items: center; gap: 10px; font-size: .74rem; margin-bottom: 6px; }
-.stat-row .sname { width: 76px; color: var(--ink-dim); flex: none; }
-.stat-track { flex: 1; height: 11px; border: 2px solid var(--line-dark); background: var(--bg); padding: 1px; }
-.stat-fill { height: 100%; background: repeating-linear-gradient(90deg, var(--green) 0 6px, #93b784 6px 12px); }
-.stat-fill.o { background: repeating-linear-gradient(90deg, var(--orange) 0 6px, #eaa95c 6px 12px); }
-.stat-fill.b { background: repeating-linear-gradient(90deg, var(--blue) 0 6px, #9ab4d0 6px 12px); }
-.stat-row .sval { width: 42px; text-align: right; color: var(--ink-dim); flex: none; }
-
-.job-chain { margin: 30px 0 8px; }
-.job-chain img { width: 100%; height: auto; display: block; border: 3px solid var(--line); }
-.job-chain figcaption { font-size: .7rem; color: var(--ink-dim); margin-top: 6px; text-align: center; }
-
-.tree-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
-.branch { background: var(--bg-panel); border: var(--px) solid var(--line); box-shadow: var(--px) var(--px) 0 var(--line-dark); padding: 16px 14px 20px; }
-.branch h3 { font-size: .95rem; text-align: center; margin-bottom: 2px; }
-.branch .btag { font-size: .64rem; color: var(--ink-dim); text-align: center; display: block; margin-bottom: 14px; }
-.branch.data h3 { color: var(--blue); }
-.branch.craft h3 { color: var(--pink); }
-.branch.biz h3 { color: var(--orange); }
-
-.tier { position: relative; }
-.tier + .tier { margin-top: 4px; padding-top: 12px; }
-.tier + .tier::before {
-  content: ''; position: absolute; top: 0; left: 50%;
-  width: 0; height: 12px; border-left: 4px dotted var(--line-dark);
-}
-.tier-label { font-size: .58rem; color: var(--ink-dim); text-align: center; letter-spacing: .1em; margin-bottom: 6px; }
-
-.skill {
-  display: flex; align-items: center; gap: 9px;
-  border: 2px solid var(--line); background: var(--bg);
-  padding: 5px 8px; margin-bottom: 6px;
-  cursor: help; position: relative;
-  opacity: 0; transform: translateX(-6px);
-  transition: opacity .25s, transform .25s steps(3), border-color .15s;
-}
-.skill.shown { opacity: 1; transform: none; }
-/* hover 时的 transform 会新建层叠上下文，若不抬 z-index，提示框会被后面的同级技能盖住 */
-.skill.shown:hover { border-color: var(--green); transform: translate(-2px, -2px); z-index: 30; }
-.skill .ico {
-  width: 26px; height: 26px; flex: none;
-  image-rendering: pixelated;
-  border: 1px solid var(--line-dark);
-  object-fit: contain;
-}
-@media (prefers-reduced-motion: reduce) {
-  .skill { opacity: 1; transform: none; transition: none; }
-}
-.skill .sk-name { font-size: .76rem; line-height: 1.4; }
-.skill .sk-state { margin-left: auto; font-size: .58rem; flex: none; padding: 0 5px; color: #fff; }
-.skill.mastered .sk-state { background: var(--green); }
-.skill.training .sk-state { background: var(--orange); }
-.skill.training { border-style: dashed; }
-.skill .sk-tip {
-  display: none; position: absolute; left: -6px; right: -6px; top: calc(100% + 4px);
-  z-index: 40; background: var(--ink); color: #f7f1e5;
-  font-size: .68rem; line-height: 1.6; padding: 8px 10px;
-  box-shadow: 3px 3px 0 rgba(0,0,0,.18);
-}
-.skill:hover .sk-tip { display: block; }
-.skill .sk-tip .from { color: var(--orange); }
-
-.tree-legend { display: flex; gap: 18px; justify-content: center; margin-top: 20px; font-size: .72rem; color: var(--ink-dim); flex-wrap: wrap; }
-.tree-legend b { color: #fff; padding: 0 5px; font-size: .6rem; font-weight: normal; }
-.tree-legend b.m { background: var(--green); }
-.tree-legend b.t { background: var(--orange); }
 
 /* ============ 2 · 世界地图 ============ */
 #map .map-grid { display: grid; gap: 2px; justify-content: center; margin: 32px 0 20px; }
@@ -413,19 +249,19 @@ img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
 #map .cell.lit-O { background: var(--teal); }
 #map .cell:hover { outline: 2px solid var(--ink); cursor: crosshair; }
 .map-stats { text-align: center; color: var(--ink-dim); font-size: .85rem; margin-bottom: 24px; }
-.map-stats b { color: var(--green); }
+.map-stats b { color: var(--green-text); }
 .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; justify-content: center; }
 .legend .item { font-size: .8rem; color: var(--ink-dim); display: inline-flex; align-items: center; gap: 6px; cursor: default; }
 .legend .sw { width: 12px; height: 12px; display: inline-block; background: var(--line-dark); }
 .legend .item.v { color: var(--ink); }
 .china-bar { margin-top: 36px; }
 .china-bar .row { display: flex; justify-content: space-between; font-size: .8rem; color: var(--ink-dim); margin-bottom: 6px; }
-.china-bar .row b { color: var(--orange); }
+.china-bar .row b { color: var(--orange-text); }
 .china-track { height: 14px; border: 3px solid var(--line-dark); background: var(--bg-panel); padding: 2px; }
 .china-fill { height: 100%; background: repeating-linear-gradient(90deg, var(--orange) 0 8px, #eaa95c 8px 16px); }
 .china-note { font-size: .78rem; color: var(--ink-dim); margin-top: 10px; }
-.china-note .lock { color: var(--red); }
-#map-tip { text-align: center; min-height: 2.2em; margin-top: 14px; font-size: .85rem; color: var(--green); }
+.china-note .lock { color: var(--red-text); }
+#map-tip { text-align: center; min-height: 2.2em; margin-top: 14px; font-size: .85rem; color: var(--green-text); }
 
 /* ============ 3 · 创作物品栏 ============ */
 #inventory .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
@@ -435,12 +271,12 @@ img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
   padding: 18px;
   transition: border-color .2s, transform .2s steps(2);
 }
-.slot:hover { border-color: var(--green); transform: translate(-2px, -2px); }
+.slot:hover { border-color: var(--green); }
 .slot .icon { font-size: 1.6rem; }
-.slot .kind { font-size: .68rem; color: var(--orange); letter-spacing: .1em; margin-top: 6px; }
+.slot .kind { font-size: .68rem; color: var(--orange-text); letter-spacing: .1em; margin-top: 6px; }
 .slot h3 { font-size: 1rem; margin: 2px 0 8px; }
 .slot p { font-size: .8rem; color: #6b6256; line-height: 1.7; }
-.slot a { color: var(--green); font-size: .78rem; text-decoration: none; }
+.slot a { color: var(--green-text); font-size: .78rem; text-decoration: none; }
 .slot a:hover { text-decoration: underline; }
 .slot .todo { color: var(--ink-dim); font-size: .78rem; }
 
@@ -454,18 +290,16 @@ img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
 #links .dot { width: 10px; height: 10px; background: var(--green); }
 #links .dot.off { background: var(--line-dark); }
 #links a { color: var(--ink); text-decoration: none; }
-#links a:hover { color: var(--orange); }
+#links a:hover { color: var(--orange-text); }
 #links .tag { margin-left: auto; font-size: .72rem; color: var(--ink-dim); }
 
 footer { text-align: center; color: var(--ink-dim); font-size: .72rem; padding: 60px 20px 80px; }
-footer .c { color: var(--orange); }
+footer .c { color: var(--orange-text); }
 
 /* 窄屏：径向星盘 → 竖排技能表（星盘在手机上会糊成 6px 字） */
 @media (max-width: 720px) {
   .starmap { display: none; }
   .skill-list { display: block; }
-  .tree-grid { grid-template-columns: 1fr; }
-  .char-panel { grid-template-columns: 130px 1fr; gap: 16px; }
 }
 @media (max-width: 560px) {
   section { padding: clamp(48px, 12vw, 64px) 16px; }
@@ -474,8 +308,50 @@ footer .c { color: var(--orange); }
   #map .cell { width: 11px; height: 11px; }
   .chapter { grid-template-columns: 40px 1fr; gap: 11px; }
   .chapter.is-side { margin-left: 12px; }
-  .char-panel { grid-template-columns: 1fr; }
-  .char-panel .portrait { max-width: 200px; margin: 0 auto; }
   .sl-sub { grid-template-columns: 1fr; gap: 3px; }
   .sl-subname { padding-top: 0; }
 }
+
+/* 键盘焦点：像素风高亮（craft-floor: 可见焦点是状态底线） */
+a:focus-visible, button:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+
+/* press-start 悬停/聚焦反馈 */
+.press-start:hover, .press-start:focus-visible { transform: translateY(-2px); animation-play-state: paused; opacity: 1; }
+
+/* 情绪曲线自绘 = 全站唯一的主创作瞬间（animate.md: focal 500–800ms）
+   隐藏态由 JS 加 .curve-anim 后才生效——脚本失效时曲线默认完整可见 */
+.curve-wrap.curve-anim path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.curve-wrap.curve-anim circle, .curve-wrap.curve-anim text { opacity: 0; }
+.curve-wrap.curve-anim.drawn path { stroke-dashoffset: 0; transition: stroke-dashoffset var(--dur-focal) var(--ease-out) .1s; }
+.curve-wrap.curve-anim.drawn circle, .curve-wrap.curve-anim.drawn text { opacity: 1; transition: opacity var(--dur-state) var(--ease-out) .58s; }
+
+@keyframes tip-in { from { opacity: 0; transform: translateY(4px); } }
+
+/* 统一减动效：blink / bob / 曲线自绘 / 位移全部静止，内容直接呈现 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .curve-wrap.curve-anim path { stroke-dashoffset: 0; }
+  .curve-wrap.curve-anim circle, .curve-wrap.curve-anim text { opacity: 1; }
+  .chapter { transform: none; }
+}
+
+/* hover 位移只给精确指针（触屏点按不产生粘住的悬浮位移）；色彩反馈对所有设备保留 */
+@media (hover: hover) and (pointer: fine) {
+  .tags a:hover { transform: translateY(-2px); }
+  .slot:hover { transform: translate(-2px, -2px); }
+}
+
+/* 像素按钮按压：主 CTA 按下有 2px 下压 */
+.press-start:active { transform: translateY(2px); }
+.tags a:active { transform: translateY(1px); }
+
+/* 情绪曲线圆点：hover 放大，提示可点击 */
+.curve-wrap a circle { transition: r var(--dur-tap) var(--ease-out); }
+.curve-wrap a:hover circle, .curve-wrap a:focus-visible circle { r: 9; }
+
+/* 中国省份进度条：首次滚入时按像素阶梯充能一次（steps 签名） */
+.china-fill { transform: scaleX(0); transform-origin: left; }
+.china-bar.charged .china-fill { transform: scaleX(1); transition: transform .6s steps(12); }
+@media (prefers-reduced-motion: reduce) { .china-fill { transform: scaleX(1); } }
+/* 无 JS 兜底：未标记 charged 时也要可见 */
+.china-bar:not(.js) .china-fill { transform: scaleX(1); }
