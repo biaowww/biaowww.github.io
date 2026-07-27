@@ -119,6 +119,8 @@ const visitedCount = footprint.continents.filter((c) => c.visited).length;
 const explorePct = Math.round((visitedCount / 7) * 100);
 const chinaPct = Math.round((footprint.china.visited / footprint.china.total) * 100);
 const swVar: Record<string, string> = { R: '--green', E: '--blue', N: '--orange', A: '--pink', O: '--teal' };
+// SVG 里作为「文字」出现的颜色走文字层 token（对比度 ≥4.5:1）；节点/连线仍用亮色层
+const textTier: Record<string, string> = { '--blue': '--blue-text', '--pink': '--pink-text', '--orange': '--orange-text' };
 ---
 
 <html lang="zh-CN">
@@ -126,7 +128,12 @@ const swVar: Record<string, string> = { R: '--green', E: '--blue', N: '--orange'
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>BIAO WANG · 白手起家的游戏农民工</title>
-    <meta name="description" content="王彪的个人网站：一个经历超杂的游戏农民工的英雄旅程、技能树、世界探索度与创作物品栏。" />
+    <meta name="description" content="王彪的个人网站：一个经历超杂的游戏农民工的英雄旅程、技能星盘、世界探索度与创作物品栏。" />
+    <link rel="icon" href={`${base}favicon.ico`} sizes="any" />
+    <meta name="theme-color" content="#f7f1e5" />
+    <meta property="og:title" content="BIAO WANG · 白手起家的游戏农民工" />
+    <meta property="og:description" content="英雄旅程 · 技能星盘 · 世界探索度 —— 一个把「玩」当主线任务的人。" />
+    <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
     <link
       rel="stylesheet"
@@ -171,7 +178,7 @@ const swVar: Record<string, string> = { R: '--green', E: '--blue', N: '--orange'
       <!-- 情绪曲线 -->
       <div class="curve-wrap">
         <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="人生情绪曲线">
-          <path d={pathD} fill="none" stroke="var(--orange)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+          <path d={pathD} pathLength="1" fill="none" stroke="var(--orange)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
           {pts.map((p) => (
             p.id ? (
               <a href={`#ch-${p.id}`}>
@@ -252,11 +259,11 @@ const swVar: Record<string, string> = { R: '--green', E: '--blue', N: '--orange'
               data-n={nd.name} data-s={nd.state} data-from={nd.from} data-c={nd.color} />
           ))}
           {subLabels.map((l) => (
-            <text x={l.x} y={l.y} fill={`var(${l.color})`} text-anchor={l.anchor}
-              dominant-baseline="middle" font-size="12.5" opacity="0.85">{l.name}</text>
+            <text x={l.x} y={l.y} fill={`var(${textTier[l.color] ?? l.color})`} text-anchor={l.anchor}
+              dominant-baseline="middle" font-size="12.5">{l.name}</text>
           ))}
           {branchAnchor.map((b) => (
-            <text x={b.x} y={b.y} fill={`var(${b.color})`} text-anchor="middle" font-size="15" font-weight="bold" opacity="0.9">{b.name}</text>
+            <text x={b.x} y={b.y} fill={`var(${textTier[b.color] ?? b.color})`} text-anchor="middle" font-size="15" font-weight="bold">{b.name}</text>
           ))}
         </svg>
         <div class="star-tip" id="starTip" hidden></div>
@@ -354,25 +361,35 @@ const swVar: Record<string, string> = { R: '--green', E: '--blue', N: '--orange'
     </footer>
 
     <script>
-      // 章节滚动点亮（灰→彩淡入，点亮不熄灭）
+      // 滚动揭示：章节点亮 + 曲线自绘 + 进度条充能（都只触发一次，点亮不熄灭）
       const chapterEls = [...document.querySelectorAll('[data-chapter]')];
       const lit = new Set();
-      function checkChapters() {
+      const curveWrap = document.querySelector('.curve-wrap');
+      const chinaBar = document.querySelector('.china-bar');
+      // JS 可用才接管隐藏态——脚本失效时曲线与进度条默认完整可见
+      if (curveWrap) curveWrap.classList.add('curve-anim');
+      if (chinaBar) chinaBar.classList.add('js');
+      function onScroll() {
         const vh = window.innerHeight;
         for (const c of chapterEls) {
           if (lit.has(c)) continue;
           if (c.getBoundingClientRect().top < vh * 0.72) { c.classList.add('lit'); lit.add(c); }
         }
+        if (curveWrap && !curveWrap.classList.contains('drawn') && curveWrap.getBoundingClientRect().top < vh * 0.8) {
+          curveWrap.classList.add('drawn');
+        }
+        if (chinaBar && !chinaBar.classList.contains('charged') && chinaBar.getBoundingClientRect().top < vh * 0.85) {
+          chinaBar.classList.add('charged');
+        }
       }
-      addEventListener('scroll', checkChapters, { passive: true });
-      addEventListener('resize', checkChapters);
-      checkChapters();
+      addEventListener('scroll', onScroll, { passive: true });
+      addEventListener('resize', onScroll);
+      onScroll();
 
       // 技能星盘：悬停光点看详情（技能名 · 状态 · 习得于哪一章）
       const CHTITLE = JSON.parse(document.getElementById('ch-title').textContent);
       const SLABEL = { lit: '已点亮', learning: '修炼中', locked: '未点亮' };
       const starTip = document.getElementById('starTip');
-      const starmap = document.querySelector('.starmap');
       document.querySelectorAll('.snode').forEach((nd) => {
         nd.addEventListener('mouseenter', (e) => {
           const s = nd.dataset.s, from = nd.dataset.from;
@@ -384,9 +401,10 @@ const swVar: Record<string, string> = { R: '--green', E: '--blue', N: '--orange'
           starTip.hidden = false;
         });
         nd.addEventListener('mousemove', (e) => {
-          const box = starmap.getBoundingClientRect();
-          starTip.style.left = (e.clientX - box.left + 12) + 'px';
-          starTip.style.top = (e.clientY - box.top + 12) + 'px';
+          // fixed 定位 + transform 驱动：不触发布局，无每帧强制布局读取（Emil 审计 F4）
+          const x = Math.min(e.clientX + 14, window.innerWidth - 236);
+          const y = Math.min(e.clientY + 14, window.innerHeight - 80);
+          starTip.style.transform = 'translate(' + x + 'px,' + y + 'px)';
         });
         nd.addEventListener('mouseleave', () => { starTip.hidden = true; });
       });
